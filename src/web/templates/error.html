@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Error</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8d7da;
+            color: #721c24;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .error-container {
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            border-radius: 5px;
+            padding: 20px;
+            max-width: 400px;
+            text-align: center;
+        }
+        .error-title {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .error-message {
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div class="error-container">
+        <div class="error-title">Error</div>
+        <div class="error-message">{{ message }}</div>
+    </div>
+</body>
+</html>
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Error - SpinNSlot</title>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+<body>
+    {% include 'header.html' %}
+    
+    <main class="content container">
+        <div class="alert alert-danger mt-4" role="alert">
+            <h4 class="alert-heading">Error</h4>
+            <p>{{ message }}</p>
+            <hr>
+            <p class="mb-0">Please try again or contact support if the problem persists.</p>
+        </div>
+    </main>
+    
+    {% include 'footer.html' %}
+    
+    <script>
+        // Header scripts
+        function toggleMenu() {
+            const menu = document.getElementById('dropdownMenu');
+            menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+        }
+    
+        function logout() {
+            window.location.href = '/logout';
+        }
+    
+        document.addEventListener('click', function (event) {
+            const menu = document.getElementById('dropdownMenu');
+            const trigger = document.querySelector('.menu-trigger');
+            if (!menu.contains(event.target) && !trigger.contains(event.target)) {
+                menu.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>

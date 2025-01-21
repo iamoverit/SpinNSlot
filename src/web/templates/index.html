@@ -1,0 +1,129 @@
+{% load custom_filters %}
+{% load static %}
+{% load django_bootstrap5 %}
+
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Table Tennis Booking</title>
+    {% bootstrap_css %}
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+<body>
+    {% include 'header.html' %}
+    
+    <main class="content container">
+    <!-- your app -->
+        <div class="date-picker-container">
+            <label for="date-picker">Select Date:</label>
+            <input type="date" id="date-picker" value="{{ selected_date|date:'Y-m-d' }}" min="{{ today|date:'Y-m-d' }}">
+            <span class="selected-date">
+                Showing reservations for: 
+                <strong>{{ selected_date|date:"F j, Y" }}</strong>
+            </span>
+        </div>
+        <div class="booking-table-div">
+            <table class="booking-table">
+                <thead>
+                    <tr>
+                        <th>Time</th>
+                        {% for itemSlot in itemSlots %}
+                            <th>{{ itemSlot.name }}</th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for timeSlot in timeSlots %}
+                    <tr>
+                        <td>{{ timeSlot.time_slot|time:"H:i" }}</td>
+                        {% for itemSlot in itemSlots %}
+                            {% with schedule|get:timeSlot|get:itemSlot as userSlot %}
+                            <td class="{% if userSlot.user.id == user.id %}user_reserved{% elif userSlot%}reserved{% else %}free{% endif %}">
+                                {% if userSlot %}
+                                    Reserved by 
+                                        {% if userSlot.user.id == user.id %}
+                                            You
+                                        {% else %}
+                                            {{ userSlot.user }}
+                                        {% endif %}
+                                        {% if userSlot.user.id == user.id or user.is_staff or user.is_superuser %}
+                                            <a href="{% url 'unbook_slot' userSlot.id %}?date={{ selected_date|date:'Y-m-d' }}" 
+                                            class="btn btn-primary cancel-btn"
+                                            data-time="{{ userSlot.user }}">&#10006;</a>
+                                        {% endif %}
+                                {% else %}
+                                    <a href="{% url 'book_slot' timeSlot.id itemSlot.id %}?date={{ selected_date|date:'Y-m-d' }}" 
+                                       class="btn btn-primary book-btn" 
+                                       data-time="{{ timeSlot.id }}" 
+                                       data-item="{{ itemSlot.id }}">Book</a>
+                                {% endif %}
+                            </td>
+                            {% endwith %}
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </main>
+    
+    {% include 'footer.html' %}
+    {% bootstrap_javascript %}
+    <script>
+        // Функция для показа/скрытия подменю
+        function toggleMenu() {
+          const menu = document.getElementById('dropdownMenu');
+          menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+        }
+    
+        function logout() {
+            window.location.href = '/logout';
+        }
+    
+        // Закрытие подменю при клике вне его области
+        document.addEventListener('click', function (event) {
+          const menu = document.getElementById('dropdownMenu');
+          const trigger = document.querySelector('.menu-trigger');
+          if (!menu.contains(event.target) && !trigger.contains(event.target)) {
+            menu.style.display = 'none';
+          }
+        });
+      </script>
+      <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const datePicker = document.getElementById('date-picker');
+            
+            // Update page when date changes
+            datePicker.addEventListener('change', function() {
+                const selectedDate = this.value;
+                // Update URL with selected date
+                const url = new URL(window.location.href);
+                url.searchParams.set('date', selectedDate);
+                window.location.href = url.toString();
+            });
+        });
+      </script>
+      <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const datePicker = document.getElementById('date-picker');
+            const bookButtons = document.querySelectorAll('.book-btn');
+            
+            datePicker.addEventListener('onLoad', function() {
+                const selectedDate = this.value;
+                
+                bookButtons.forEach(button => {
+                    const timeSlotId = button.dataset.time;
+                    const itemSlotId = button.dataset.item;
+                    button.href = `{% url 'book_slot' 0 0 %}`
+                        .replace('/0/', `/${timeSlotId}/`)
+                        .replace('/0/', `/${itemSlotId}/`) 
+                        + `?date=${selectedDate}`;
+                });
+            });
+        });
+      </script>
+</body>
+</html>

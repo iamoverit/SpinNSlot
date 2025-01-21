@@ -1,0 +1,51 @@
+{% load static %}
+<header>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{% url 'index' %}">SpinNSlot</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="{% url 'index' %}">Home</a>
+                    </li>
+                </ul>
+                <div class="user-info">
+                    {% if request.user.is_authenticated %}
+                        <span class="user-name logout-button">
+                            <div class="telegram-icon"></div>
+                            {{ request.user }}!
+                        </span>
+                        {% if request.user.avatar_url %}
+                        <img src="{{ request.user.avatar_url }}" alt="Image" class="circle-image menu-trigger" onclick="toggleMenu()">
+                        {% else %}
+                        <div class="circle-logo menu-trigger" onclick="toggleMenu()">
+                            {% if request.user.first_name %}
+                            {% with username_initials=request.user.first_name|slice:":1"|capfirst|add:request.user.last_name|slice:":2"|capfirst %}
+                            {{ username_initials }}
+                            {% endwith %}
+                            {% else %}
+                            {% with username_initials=request.user.username|slice:":1"|capfirst %}
+                            {{ username_initials }}
+                            {% endwith %}
+                            {% endif %}
+                        </div>
+                        {% endif %}
+                        <div class="dropdown-menu" id="dropdownMenu">
+                            <button onclick="logout()">Logout</button>
+                        </div>
+                    {% else %}
+                        <script src="https://telegram.org/js/telegram-widget.js" async
+                            data-telegram-login="FlagmanTTbot" 
+                            data-size="large" 
+                            data-auth-url="/telegram-login/" 
+                            data-request-access="write">
+                        </script>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </nav>
+</header>

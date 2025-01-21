@@ -1,0 +1,73 @@
+from django.db import models
+
+# Create your models here.
+from django.db import models
+from django.contrib.auth.models import User
+from django.contrib.auth.models import AbstractUser
+
+class CustomUser(AbstractUser):
+    telegram_id = models.CharField(max_length=255, unique=True, blank=True, null=True)
+    avatar_url = models.URLField(blank=True, null=True)
+
+    def __str__(self):
+        if self.first_name.strip():
+            return self.first_name + ' ' + self.last_name
+        return self.username
+
+class Customers(models.Model):
+    name = models.CharField(max_length=100, unique=True)  # Название уникальное
+    phone_number = models.CharField(max_length=100)       # Номер телефона, уникальное
+    created_at = models.DateTimeField(auto_now_add=True)  # Дата создания записи
+    updated_at = models.DateTimeField(auto_now=True)      # Дата последнего обновления
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name = "Customer"
+        verbose_name_plural = "Customers"
+
+class ItemSlot(models.Model):
+    name = models.CharField(max_length=100, unique=True)  # Название стола, уникальное
+    customer = models.ForeignKey(Customers, on_delete=models.CASCADE, related_name="customer")  # Связь с таблицей customer
+    created_at = models.DateTimeField(auto_now_add=True)  # Дата создания записи
+    updated_at = models.DateTimeField(auto_now=True)      # Дата последнего обновления
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name = "ItemSlot"
+        verbose_name_plural = "ItemSlots"
+
+class TimeSlot(models.Model):
+    customer = models.ForeignKey(Customers, on_delete=models.CASCADE, related_name="time_slots")  # Связь с Customers
+    time_slot = models.TimeField()  # Поле для хранения времени без даты
+
+    def __str__(self):
+        return f"Visit {self.customer.name} at {self.time_slot}"
+
+    class Meta:
+        verbose_name = "TimeSlot"
+        verbose_name_plural = "TimeSlots"
+
+from django.utils import timezone
+
+class UserSlot(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='users')
+    table = models.ForeignKey(ItemSlot, on_delete=models.CASCADE, related_name="user_item_slots")  # Связь с таблицей ItemSlot
+    time =  models.ForeignKey(TimeSlot, on_delete=models.CASCADE, related_name="user_time_slots")  # Связь с таблицей TimeSlot
+    reservation_date = models.DateField(default=timezone.now)
+
+    def __str__(self):
+        return f"{self.user.username} - {self.time.time_slot} on {self.reservation_date}"
+
+    class Meta:
+        verbose_name = "UserSlot"
+        verbose_name_plural = "UserSlots"
+        constraints = [
+            models.UniqueConstraint(
+                fields=['table', 'time', 'reservation_date'],
+                name='unique_user_table_time_date'
+            )
+        ]
