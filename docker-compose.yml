@@ -10,3 +10,8 @@ services:
       - "8000:8000"
     environment:
       - DEBUG=1
+      - VIRTUAL_HOST
+      - LETSENCRYPT_HOST
+      - TELEGRAM_BOT_NAME
+      - TELEGRAM_BOT_TOKEN
+      - TELEGRAM_LOGIN_REDIRECT_URL
