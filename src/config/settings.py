@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
+from decouple import config
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -25,7 +26,7 @@ SECRET_KEY = 'django-insecure-%h+ul2yp(w0!n**0h-s+w3)q=a=k&i7hpvdxmn-(k-3hkxspr4
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'flagman.iamoverit.ru']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', config('BASE_HOST')]
 
 
 # Application definition
@@ -133,7 +134,6 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
-from decouple import config
 
 BOOTSTRAP5 = {
 
