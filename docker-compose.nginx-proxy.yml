@@ -1,0 +1,10 @@
+version: '3.8'
+
+services:
+  web:
+    network:
+      - nginx-proxy
+  
+networks:
+  nginx-proxy:
+    external: true
