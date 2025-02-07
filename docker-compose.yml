@@ -5,6 +5,7 @@ services:
       sh -c "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
     volumes:
       - ./src:/app/src
+      - db:/app/db
     ports:
       - "8000:8000"
     environment:
@@ -15,3 +16,6 @@ services:
       - TELEGRAM_BOT_NAME
       - TELEGRAM_BOT_TOKEN
       - TELEGRAM_LOGIN_REDIRECT_URL
+
+volumes:
+  db:
