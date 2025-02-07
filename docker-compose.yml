@@ -9,7 +9,8 @@ services:
     ports:
       - "8000:8000"
     environment:
-      - DEBUG=1
+      - DEBUG
+      - DJANGO_SECRET_KEY
       - BASE_HOST
       - VIRTUAL_HOST
       - LETSENCRYPT_HOST
