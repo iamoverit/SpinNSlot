@@ -9,9 +9,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = config('DJANGO_SECRET_KEY')
 
 DEBUG = config('DEBUG')
-
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', config('BASE_HOST')]
-
+BASE_HOST = config('BASE_HOST')
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', BASE_HOST]
+CSRF_TRUSTED_ORIGINS = ['https://*.127.0.0.1', f'https://{BASE_HOST}']
 
 # Application definition
 
