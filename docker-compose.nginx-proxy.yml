@@ -2,7 +2,9 @@ services:
   web:
     networks:
       - nginx-proxy
-  
+  nginx:
+    networks:
+      - nginx-proxy
 networks:
   nginx-proxy:
     external: true
