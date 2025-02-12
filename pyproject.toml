@@ -3,16 +3,16 @@ name = "spinnslot"
 version = "0.1.0"
 description = ""
 authors = [
-    {name = "Ilya Filisteev",email = "ivfilist@mts.ru"}
+    {name = "Ilya Filisteev", email = "ivfilist@mts.ru"}
 ]
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.10,<4.0"
 dependencies = [
     "django (>=5.1.5,<6.0.0)",
     "python-decouple (>=3.8,<4.0)",
     "django-bootstrap5 (>=24.3,<25.0)",
+    "gunicorn (>=23.0.0,<24.0.0)"
 ]
-
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
