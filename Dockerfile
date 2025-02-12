@@ -9,7 +9,7 @@ ENV PYTHONUNBUFFERED 1
 WORKDIR /app
 
 # Copy dependency definitions to the container
-COPY pyproject.toml poetry.lock README.md ./
+COPY pyproject.toml poetry.lock README.md gunicorn_config.py ./
 
 # Install dependencies using Poetry
 RUN pip install --upgrade pip && \
