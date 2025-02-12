@@ -24,4 +24,4 @@ COPY src/ .
 EXPOSE 8000
 
 # Run the application with Gunicorn
-CMD ["gunicorn", "--config", "gunicorn_config.py", "src.config.wsgi:application"]
+CMD ["gunicorn", "--config", "gunicorn_config.py", "config.wsgi:application"]

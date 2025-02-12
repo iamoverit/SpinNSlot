@@ -2,21 +2,30 @@ services:
   web:
     build: .
     command: >
-      sh -c "python manage.py migrate && gunicorn --config gunicorn_config.py src.config.wsgi:application"
+      sh -c "python manage.py migrate && python manage.py collectstatic --noinput && gunicorn --config gunicorn_config.py config.wsgi:application"
     volumes:
-      - ./src:/app/src
       - db:/app/db
-    ports:
-      - "8000:8000"
+      - static_volume:/app/staticfiles
+    expose:
+      - 8000
     environment:
       - DEBUG
       - DJANGO_SECRET_KEY
       - BASE_HOST
-      - VIRTUAL_HOST
-      - LETSENCRYPT_HOST
       - TELEGRAM_BOT_NAME
       - TELEGRAM_BOT_TOKEN
       - TELEGRAM_LOGIN_REDIRECT_URL
-
+  nginx:
+    build: ./nginx
+    volumes:
+      - static_volume:/app/staticfiles
+    expose:
+      - 80
+    environment:
+      - VIRTUAL_HOST
+      - LETSENCRYPT_HOST
+    depends_on:
+      - web
 volumes:
   db:
+  static_volume:
