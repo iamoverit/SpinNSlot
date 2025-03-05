@@ -1,18 +1,39 @@
 import json
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
+from django.utils import timezone
 from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
 from django.contrib.auth import login, logout
 from django.urls import reverse
 from django.conf import settings
 from django.shortcuts import render
 from django.db.models import Q
+from django.utils import timezone
+from .models import Tournament, TournamentRegistration
 
 from .permissions import staff_or_author_required
 from .validators import validate_telegram_data
 from .models import TimeSlot, ItemSlot, UserSlot, CustomUser
 
 from datetime import date
+
+def tournament_list(request):
+    tournaments = Tournament.objects.all()
+    return render(request, 'tournament_list.html', {'tournaments': tournaments})
+
+def tournament_detail(request, tournament_id):
+    tournament = get_object_or_404(Tournament, pk=tournament_id)
+    
+    registration = TournamentRegistration.objects.filter(
+        user=request.user,
+        tournament=tournament
+    ).first() if request.user.is_authenticated else None
+
+    return render(request, 'tournament_detail.html', {
+        'tournament': tournament,
+        'is_registered': registration is not None,
+        'registration_date': registration.registration_date if registration else None
+    })
 
 def index(request):
     timeSlots = TimeSlot.objects.all()
@@ -52,6 +73,19 @@ def index(request):
         'today': date.today(),
     }
     return render(request, 'index.html', context)
+
+@login_required
+def register_tournament(request, tournament_id):
+    tournament = get_object_or_404(Tournament, pk=tournament_id)
+    
+    if TournamentRegistration.objects.filter(user=request.user, tournament=tournament).exists():
+        return render(request, 'error.html', {'message': 'Вы уже зарегистрированы на этот турнир'})
+    
+    if tournament.participants.count() >= tournament.max_participants:
+        return render(request, 'error.html', {'message': 'Достигнут лимит участников'})
+    
+    TournamentRegistration.objects.create(user=request.user, tournament=tournament)
+    return redirect('tournament_detail', tournament_id=tournament.id)
 
 @login_required
 def book_slot(request, time_slot_id, item_slot_id):

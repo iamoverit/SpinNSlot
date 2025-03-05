@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Upcoming Tournaments</h2>
+    <div class="row">
+        {% for tournament in tournaments %}
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">{{ tournament.name }}</h5>
+                    <h6 class="card-subtitle mb-2 text-muted">
+                        {{ tournament.date }} {{ tournament.start_time|time:"H:i" }}-{{ tournament.end_time|time:"H:i" }}
+                    </h6>
+                    <p class="card-text">{{ tournament.description }}</p>
+                    <a href="{% url 'tournament_detail' tournament.id %}" class="btn btn-primary">
+                        View Details ({{ tournament.participants.count }}/{{ tournament.max_participants }})
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <div class="alert alert-info">No upcoming tournaments scheduled</div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

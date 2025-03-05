@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import ItemSlot, UserSlot, Customers, TimeSlot
+from .models import ItemSlot, UserSlot, Customers, TimeSlot, Tournament, TournamentRegistration
 
 # Register your models here.
 
@@ -29,3 +29,18 @@ class TimeSlotsAdmin(admin.ModelAdmin):
     list_display = ('customer', 'time_slot')
     list_filter = ('time_slot',)
     search_fields = ('customer__name',)
+
+# ТОЛЬКО через декоратор
+@admin.register(Tournament)
+class TournamentAdmin(admin.ModelAdmin):
+    list_display = ('name', 'date', 'customer', 'participants_count')
+    filter_horizontal = ('tables',)
+    
+    def participants_count(self, obj):
+        return f"{obj.participants.count()}/{obj.max_participants}"
+
+# НЕТ повторной регистрации через admin.site.register()
+@admin.register(TournamentRegistration)
+class TournamentRegistrationAdmin(admin.ModelAdmin):
+    list_display = ('user', 'tournament', 'registration_date')
+    list_filter = ('tournament',)

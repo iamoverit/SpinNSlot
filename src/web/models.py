@@ -72,6 +72,42 @@ class TimeSlot(models.Model):
 
 from django.utils import timezone
 
+class Tournament(models.Model):
+    customer = models.ForeignKey(Customers, on_delete=models.CASCADE, verbose_name="Организатор")
+    name = models.CharField(max_length=200, verbose_name="Название турнира")
+    date = models.DateField(verbose_name="Дата проведения")
+    start_time = models.TimeField(verbose_name="Время начала")
+    end_time = models.TimeField(verbose_name="Время окончания")
+    tables = models.ManyToManyField(ItemSlot, verbose_name="Используемые столы")
+    max_participants = models.PositiveIntegerField(verbose_name="Максимум участников")
+    description = models.TextField(verbose_name="Описание")
+    participants = models.ManyToManyField(
+        CustomUser,
+        through='TournamentRegistration',
+        through_fields=('tournament', 'user'),
+        verbose_name="Участники"
+    )
+
+    class Meta:
+        verbose_name = "Турнир"
+        verbose_name_plural = "Турниры"
+
+    def __str__(self):
+        return f"{self.name} ({self.date} {self.start_time}-{self.end_time})"
+
+class TournamentRegistration(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, verbose_name="Пользователь")
+    tournament = models.ForeignKey(Tournament, on_delete=models.CASCADE, verbose_name="Турнир")
+    registration_date = models.DateTimeField(auto_now_add=True, verbose_name="Дата регистрации")
+
+    class Meta:
+        verbose_name = "Регистрация на турнир"
+        verbose_name_plural = "Регистрации на турниры"
+        unique_together = ('user', 'tournament')
+
+    def __str__(self):
+        return f"{self.user} → {self.tournament}"
+
 class UserSlot(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='users')
     table = models.ForeignKey(ItemSlot, on_delete=models.CASCADE, related_name="user_item_slots")  # Связь с таблицей ItemSlot

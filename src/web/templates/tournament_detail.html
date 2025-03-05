@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load custom_filters %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            <h2 class="mb-0">{{ tournament.name }}</h2>
+        </div>
+        
+        <div class="card-body">
+            <div class="row">
+                <!-- Основная информация -->
+                <div class="col-md-8">
+                    <dl class="row">
+                        <dt class="col-sm-4">Дата и время:</dt>
+                        <dd class="col-sm-8">
+                            {{ tournament.date|date:"j E Y" }}
+                            {{ tournament.start_time|time:"H:i" }}–{{ tournament.end_time|time:"H:i" }}
+                        </dd>
+                        
+                        <dt class="col-sm-4">Доступные столы:</dt>
+                        <dd class="col-sm-8">
+                            {% for table in tournament.tables.all %}
+                            <span class="badge bg-secondary me-1">{{ table.name }}</span>
+                            {% endfor %}
+                        </dd>
+                        
+                        <dt class="col-sm-4">Участники:</dt>
+                        <dd class="col-sm-8">
+                            <div class="progress" style="height: 25px;">
+                                <div class="progress-bar" 
+                                    role="progressbar" 
+                                    style="width: {{ tournament.participants.count|percentage:tournament.max_participants }}">
+                                    {{ tournament.participants.count }}/{{ tournament.max_participants }}
+                                </div>
+                            </div>
+                        </dd>
+                    </dl>
+                    
+                    <div class="mb-4">
+                        <h4>Описание турнира</h4>
+                        <p class="lead">{{ tournament.description }}</p>
+                    </div>
+                </div>
+                
+                <!-- Блок регистрации -->
+                <div class="col-md-4 border-start">
+                    <div class="sticky-top" style="top: 20px;">
+                        {% if not request.user.is_authenticated %}
+                        <div class="alert alert-warning">
+                            Для регистрации необходимо <a href="{% url 'telegram_login' %}">войти через Telegram</a>
+                        </div>
+                        {% else %}
+                            {% if is_registered %}
+                            <div class="alert alert-success">
+                                <h5>✅ Вы зарегистрированы!</h5>
+                                <p class="mb-0 small">Дата регистрации: {{ registration_date|date:"j E Y H:i" }}</p>
+                            </div>
+                            {% else %}
+                            <div class="d-grid gap-2">
+                                {% if tournament.participants.count < tournament.max_participants %}
+                                <form method="post" action="{% url 'register_tournament' tournament.id %}">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-success btn-lg">
+                                        Зарегистрироваться
+                                    </button>
+                                </form>
+                                {% else %}
+                                <button class="btn btn-secondary btn-lg" disabled>
+                                    Турнир заполнен
+                                </button>
+                                {% endif %}
+                            </div>
+                            {% endif %}
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
