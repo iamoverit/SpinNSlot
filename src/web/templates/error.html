@@ -1,52 +1,14 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Error</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f8d7da;
-            color: #721c24;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-        }
-        .error-container {
-            background-color: #f8d7da;
-            border: 1px solid #f5c6cb;
-            border-radius: 5px;
-            padding: 20px;
-            max-width: 400px;
-            text-align: center;
-        }
-        .error-title {
-            font-size: 24px;
-            font-weight: bold;
-            margin-bottom: 10px;
-        }
-        .error-message {
-            font-size: 16px;
-        }
-    </style>
-</head>
-<body>
-    <div class="error-container">
-        <div class="error-title">Error</div>
-        <div class="error-message">{{ message }}</div>
-    </div>
-</body>
-</html>
+{% load static %}
+{% load django_bootstrap5 %}
+
 <!DOCTYPE html>
 <html>
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Error - SpinNSlot</title>
+    <title>Table Tennis Booking</title>
+    {% bootstrap_css %}
     <link rel="stylesheet" href="{% static 'css/styles.css' %}">
 </head>
 <body>
@@ -61,19 +23,20 @@
         </div>
     </main>
     
+
     {% include 'footer.html' %}
-    
+    {% bootstrap_javascript %}
     <script>
         // Header scripts
         function toggleMenu() {
             const menu = document.getElementById('dropdownMenu');
             menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
         }
-    
+
         function logout() {
             window.location.href = '/logout';
         }
-    
+
         document.addEventListener('click', function (event) {
             const menu = document.getElementById('dropdownMenu');
             const trigger = document.querySelector('.menu-trigger');

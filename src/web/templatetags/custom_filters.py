@@ -1,6 +1,6 @@
 from django import template
 
-from web.models import CustomUser, Tournament
+from web.models import UserSlot, Tournament
 
 register = template.Library()
 
@@ -31,8 +31,8 @@ def split_tournament_reason(value):
     return None
 
 @register.filter
-def is_user(value):
-    return isinstance(value, CustomUser)
+def is_userslot(value):
+    return isinstance(value, UserSlot)
 
 @register.filter
 def is_tournament(value):

@@ -98,14 +98,14 @@ def index(request):
     for timeSlot in timeSlots:
         schedule[timeSlot] = {}
         for itemSlot in itemSlots:
-            reserved_user = next((userSlot.user for userSlot in userSlots if userSlot.time == timeSlot and userSlot.table == itemSlot), None)
+            reserved_user = next((userSlot for userSlot in userSlots if userSlot.time == timeSlot and userSlot.table == itemSlot), None)
             reserved_tournament = next((tournament for tournament in tournaments if timeSlot in tournament.time_slots.all() and itemSlot in tournament.tables.all()), None)
+            schedule[timeSlot][itemSlot] = None
             if reserved_user:
                 schedule[timeSlot][itemSlot] = reserved_user
-            elif reserved_tournament:
+            if reserved_tournament:
                 schedule[timeSlot][itemSlot] = reserved_tournament
-            else:
-                schedule[timeSlot][itemSlot] = None
+                
 
     context = {
         'timeSlots': timeSlots,

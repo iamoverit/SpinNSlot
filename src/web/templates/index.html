@@ -41,18 +41,18 @@
                         <td>{{ timeSlot.time_slot|time:"H:i" }}</td>
                         {% for itemSlot in itemSlots %}
                             {% with schedule|get:timeSlot|get:itemSlot as userSlot %}
-                            {% if userSlot|is_user %}
+                            {% if userSlot|is_userslot %}
                                 <td class="{% if userSlot.user.id == user.id %}user_reserved{% elif userSlot%}reserved{% else %}free{% endif %}">
                                 Reserved by 
                                     {% if userSlot.user.id == user.id %}
                                         You
                                     {% else %}
-                                        {{ userSlot.user }}
+                                        {{ userSlot }}
                                     {% endif %}
                                     {% if userSlot.user.id == user.id or user.is_staff or user.is_superuser %}
                                         <a href="{% url 'unbook_slot' userSlot.id %}?date={{ selected_date|date:'Y-m-d' }}" 
                                         class="btn btn-primary cancel-btn"
-                                        data-time="{{ userSlot.user }}">&#10006;</a>
+                                        data-time="{{ userSlot.user.id }}">&#10006;</a>
                                     {% endif %}
                                 </td>
                             {% elif userSlot|is_tournament %}
