@@ -33,8 +33,19 @@ class TimeSlotsAdmin(admin.ModelAdmin):
 # ТОЛЬКО через декоратор
 @admin.register(Tournament)
 class TournamentAdmin(admin.ModelAdmin):
-    list_display = ('name', 'date', 'customer', 'participants_count')
+    list_display = ('name', 'date', 'customer', 'participants_count', 'min_participants')
     filter_horizontal = ('tables',)
+    fieldsets = (
+        (None, {
+            'fields': ('customer', 'name', 'date', 'start_time', 'end_time')
+        }),
+        ('Участники', {
+            'fields': ('min_participants', 'max_participants', 'tables', 'time_slots')
+        }),
+        ('Дополнительно', {
+            'fields': ('registration_deadline', 'description', 'is_canceled')
+        }),
+    )
     
     def participants_count(self, obj):
         return f"{obj.participants.count()}/{obj.max_participants}"

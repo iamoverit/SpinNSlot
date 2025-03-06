@@ -41,26 +41,34 @@
                         <td>{{ timeSlot.time_slot|time:"H:i" }}</td>
                         {% for itemSlot in itemSlots %}
                             {% with schedule|get:timeSlot|get:itemSlot as userSlot %}
-                            <td class="{% if userSlot.user.id == user.id %}user_reserved{% elif userSlot%}reserved{% else %}free{% endif %}">
-                                {% if userSlot %}
-                                    Reserved by 
-                                        {% if userSlot.user.id == user.id %}
-                                            You
-                                        {% else %}
-                                            {{ userSlot.user }}
-                                        {% endif %}
-                                        {% if userSlot.user.id == user.id or user.is_staff or user.is_superuser %}
-                                            <a href="{% url 'unbook_slot' userSlot.id %}?date={{ selected_date|date:'Y-m-d' }}" 
-                                            class="btn btn-primary cancel-btn"
-                                            data-time="{{ userSlot.user }}">&#10006;</a>
-                                        {% endif %}
-                                {% else %}
-                                    <a href="{% url 'book_slot' timeSlot.id itemSlot.id %}?date={{ selected_date|date:'Y-m-d' }}" 
-                                       class="btn btn-primary book-btn" 
-                                       data-time="{{ timeSlot.id }}" 
-                                       data-item="{{ itemSlot.id }}">Book</a>
-                                {% endif %}
-                            </td>
+                            {% if userSlot|is_user %}
+                                <td class="{% if userSlot.user.id == user.id %}user_reserved{% elif userSlot%}reserved{% else %}free{% endif %}">
+                                Reserved by 
+                                    {% if userSlot.user.id == user.id %}
+                                        You
+                                    {% else %}
+                                        {{ userSlot.user }}
+                                    {% endif %}
+                                    {% if userSlot.user.id == user.id or user.is_staff or user.is_superuser %}
+                                        <a href="{% url 'unbook_slot' userSlot.id %}?date={{ selected_date|date:'Y-m-d' }}" 
+                                        class="btn btn-primary cancel-btn"
+                                        data-time="{{ userSlot.user }}">&#10006;</a>
+                                    {% endif %}
+                                </td>
+                            {% elif userSlot|is_tournament %}
+                                <td class="reserved">
+                                    <a href="{% url 'tournament_detail' userSlot.id %}" 
+                                    class="btn-primary" 
+                                    data-time="{{ userSlot.id }}">{{userSlot.name}}</a>
+                                </td>
+                            {% else %}
+                                <td class="free">
+                                <a href="{% url 'book_slot' timeSlot.id itemSlot.id %}?date={{ selected_date|date:'Y-m-d' }}" 
+                                    class="btn btn-primary book-btn" 
+                                    data-time="{{ timeSlot.id }}" 
+                                    data-item="{{ itemSlot.id }}">Book</a>
+                                </td>
+                            {% endif %}
                             {% endwith %}
                         {% endfor %}
                     </tr>

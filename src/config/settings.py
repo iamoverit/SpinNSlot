@@ -1,6 +1,4 @@
-# entire file content ...
 import os
-
 from pathlib import Path
 from decouple import config
 
@@ -13,8 +11,6 @@ BASE_HOST = config('BASE_HOST')
 ALLOWED_HOSTS = ['localhost', '127.0.0.1', BASE_HOST]
 CSRF_TRUSTED_ORIGINS = ['https://*.127.0.0.1', f'https://{BASE_HOST}']
 
-# Application definition
-
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -23,7 +19,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_bootstrap5',
-    'web',
+    'web.apps.WebConfig',
 ]
 
 MIDDLEWARE = [
@@ -59,7 +55,7 @@ WSGI_APPLICATION = 'config.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db' / 'db.sqlite3',  # Update the path to use the volume
+        'NAME': BASE_DIR / 'db' / 'db.sqlite3',
     }
 }
 
@@ -90,25 +86,14 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-# STATICFILES_DIRS = [                                                                                                            
-#     os.path.join(BASE_DIR, 'src/web/static'),                                                                                   
-# ]                                                                                                                               
-
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')     
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 BOOTSTRAP5 = {
-
-    # The complete URL to the Bootstrap CSS file.
-    # Note that a URL can be either a string
-    # ("https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css"),
-    # or a dict with keys `url`, `integrity` and `crossorigin` like the default value below.
     "css_url": {
         "url": "/static/css/bootstrap.min.css",
     },
-
-    # The complete URL to the Bootstrap bundle JavaScript file.
     "javascript_url": {
         "url": "/static/js/bootstrap.bundle.min.js",
     },
@@ -121,3 +106,25 @@ TELEGRAM_LOGIN_REDIRECT_URL = config('TELEGRAM_LOGIN_REDIRECT_URL', default='htt
 AUTH_USER_MODEL = 'web.CustomUser'
 
 SECURE_CROSS_ORIGIN_OPENER_POLICY = "same-origin-allow-popups"
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+        },
+        'file': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': 'django_queries.log',  # Choose a file name and path
+        },
+    },
+    'loggers': {
+        'django.db.backends': {
+            'handlers': ['console', 'file'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
+    },
+}

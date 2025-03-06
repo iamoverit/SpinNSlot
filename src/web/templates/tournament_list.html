@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load custom_filters %}
 
 {% block content %}
 <div class="container mt-4">
@@ -13,9 +14,21 @@
                     <h6 class="card-subtitle mb-2 text-muted">
                         {{ tournament.date }} {{ tournament.start_time|time:"H:i" }}-{{ tournament.end_time|time:"H:i" }}
                     </h6>
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div class="progress w-100 me-3" style="height: 20px;">
+                            <div class="progress-bar" 
+                                role="progressbar" 
+                                style="width: {{ tournament.total_participants|percentage:tournament.max_participants }}">
+                                {{ tournament.total_participants }}/{{ tournament.max_participants }}
+                            </div>
+                        </div>
+                        {% if tournament.is_cancelled %}
+                        <span class="badge bg-danger">Отменён</span>
+                        {% endif %}
+                    </div>
                     <p class="card-text">{{ tournament.description }}</p>
                     <a href="{% url 'tournament_detail' tournament.id %}" class="btn btn-primary">
-                        View Details ({{ tournament.participants.count }}/{{ tournament.max_participants }})
+                        View Details
                     </a>
                 </div>
             </div>

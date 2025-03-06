@@ -364,3 +364,16 @@ main {
     background-color: #cc3333;
     transform: scale(0.95);
 }
+
+.badge.bg-primary {
+    font-size: 0.75em;
+    vertical-align: middle;
+}
+
+.list-group-item .fw-medium {
+    color: #333;
+}
+
+.list-group-item small.text-muted {
+    font-size: 0.85em;
+}
