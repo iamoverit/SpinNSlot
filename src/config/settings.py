@@ -132,7 +132,10 @@ LOGGING = {
 
 MARKDOWNIFY = {
     "default": {
-        # "STRIP": False,
         "BLEACH": False,
+    },
+    "preview": {
+        "WHITELIST_TAGS": ["a", "br", "p"],
+        "BLEACH": True,
     }
 }

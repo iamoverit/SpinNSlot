@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 {% load custom_filters %}
+{% load markdownify %}
 
 {% block content %}
 <div class="container mt-4">
@@ -26,7 +27,7 @@
                         <span class="badge bg-danger">Отменён</span>
                         {% endif %}
                     </div>
-                    <p class="card-text">{{ tournament.description }}</p>
+                    <div class="card-text text-muted" style="font-size: 13px;">{{ tournament.description|markdownify:"preview" }}</div>
                     <a href="{% url 'tournament_detail' tournament.id %}" class="btn btn-primary">
                         View Details
                     </a>
