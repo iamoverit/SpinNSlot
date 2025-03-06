@@ -79,7 +79,6 @@ def add_guest_participant(request, tournament_id):
     return redirect('tournament_detail', tournament_id=tournament_id)
 
 def index(request):
-    connection.force_debug_cursor = True
     timeSlots = TimeSlot.objects.all()
     itemSlots = ItemSlot.objects.all()
 
@@ -115,7 +114,6 @@ def index(request):
         'selected_date': selected_date,
         'today': date.today(),
     }
-    connection.force_debug_cursor = False 
     return render(request, 'index.html', context)
 
 @login_required
