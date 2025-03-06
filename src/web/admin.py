@@ -1,6 +1,5 @@
 from django.contrib import admin
-from .models import ItemSlot, UserSlot, Customers, TimeSlot, Tournament, TournamentRegistration
-
+from .models import CustomUser, ItemSlot, UserSlot, Customers, TimeSlot, Tournament, TournamentRegistration
 # Register your models here.
 
 @admin.register(Customers)
@@ -55,3 +54,9 @@ class TournamentAdmin(admin.ModelAdmin):
 class TournamentRegistrationAdmin(admin.ModelAdmin):
     list_display = ('user', 'tournament', 'registration_date')
     list_filter = ('tournament',)
+
+@admin.register(CustomUser)
+class CustomUserAdmin(admin.ModelAdmin):
+    list_display = ('email', 'username', 'is_staff')
+    search_fields = ('email', 'username')
+    ordering = ('email',)
