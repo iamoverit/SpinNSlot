@@ -43,7 +43,7 @@ class TournamentAdmin(admin.ModelAdmin):
             'fields': ('min_participants', 'max_participants', 'tables', 'time_slots')
         }),
         ('Дополнительно', {
-            'fields': ('registration_deadline', 'description', 'is_canceled')
+            'fields': ('registration_deadline', 'description', 'is_canceled', 'is_finished')
         }),
     )
     

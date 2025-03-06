@@ -126,6 +126,7 @@ class Tournament(models.Model):
         self.reserve_slots()
     
     is_canceled = models.BooleanField(default=False, verbose_name="Отменен")
+    is_finished = models.BooleanField(default=False, verbose_name="Завершен")
     description = models.TextField(verbose_name="Описание")
     participants = models.ManyToManyField(
         CustomUser,

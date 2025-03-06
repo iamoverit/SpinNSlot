@@ -14,11 +14,12 @@ from .models import Tournament, TournamentRegistration, GuestParticipant
 from .permissions import staff_or_author_required
 from .validators import validate_telegram_data
 from .models import TimeSlot, ItemSlot, UserSlot, CustomUser
-from datetime import date
+from datetime import date, datetime, timedelta
 from django.db import connection
 
 def tournament_list(request):
-    tournaments = Tournament.objects.all()
+    yesterday = datetime.now() - timedelta(days=1)
+    tournaments = Tournament.objects.filter(is_finished=False, is_canceled=False, date__gt=yesterday).all()
     return render(request, 'tournament_list.html', {'tournaments': tournaments})
 
 def tournament_detail(request, tournament_id):
