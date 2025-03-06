@@ -19,7 +19,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_bootstrap5',
-    'web.apps.WebConfig',
+    'markdownify.apps.MarkdownifyConfig',
+    'web',
 ]
 
 MIDDLEWARE = [
@@ -127,4 +128,11 @@ LOGGING = {
             'propagate': False,
         },
     },
+}
+
+MARKDOWNIFY = {
+    "default": {
+        # "STRIP": False,
+        "BLEACH": False,
+    }
 }

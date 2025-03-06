@@ -1,6 +1,7 @@
 from django import template
 
 from web.models import UserSlot, Tournament
+import markdown
 
 register = template.Library()
 
