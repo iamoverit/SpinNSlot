@@ -377,3 +377,66 @@ main {
 .list-group-item small.text-muted {
     font-size: 0.85em;
 }
+.partial-collapse.collapse:not(.show) {
+    display: block;
+    height: 80px; /* Высота в свернутом состоянии */
+    overflow: hidden;
+    transition: height 0.5s ease-in-out;
+}
+.partial-collapse.collapsing {
+    height: 80px;
+    overflow: hidden;
+    transition: height 0.35s ease;
+}
+
+/* Градиент для плавного перехода */
+.partial-collapse {
+    position: relative;
+}
+
+.partial-collapse::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 50px;
+    background: linear-gradient(to bottom, transparent, white);
+    pointer-events: none; /* Чтобы градиент не перекрывал клики */
+    transition: opacity 0.3s ease;
+}
+
+.partial-collapse.collapse.show::after {
+    opacity: 0; /* Скрываем градиент при раскрытии */
+}
+
+/* Стрелочка */
+.toggle-partial-collapse {
+    position: absolute;
+    left: 50%; /* Центрируем по горизонтали */
+    
+    transform: translateX(-50%); /* Точное центрирование */
+    background-color: white; /* Фон кнопки */
+    padding: 5px 10px;
+    cursor: pointer;
+    z-index: 1; /* Чтобы кнопка была поверх текста */
+}
+
+.toggle-partial-collapse::after {
+    content: '';
+    position: absolute;
+    left: 50%; /* Центрируем по горизонтали */
+    top: 50%;
+    transform: translateY(-50%);
+    width: 0;
+    height: 0;
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-top: 6px solid #000; /* Стрелочка вниз */
+    transition: transform 0.3s ease;
+}
+
+/* Анимация стрелочки при раскрытии */
+#tournament-card[aria-expanded="true"] .toggle-partial-collapse::after {
+    transform: translateY(-50%) rotate(180deg); /* Стрелочка вверх */
+}

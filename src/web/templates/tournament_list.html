@@ -4,6 +4,7 @@
 {% load markdownify %}
 
 {% block content %}
+
 <div class="container mt-4">
     <h2>Upcoming Tournaments</h2>
     <div class="row">
@@ -27,11 +28,24 @@
                         <span class="badge bg-danger">Отменён</span>
                         {% endif %}
                     </div>
-                    <div class="card-text text-muted" style="font-size: 13px;">{{ tournament.description|markdownify:"preview" }}</div>
+                    <!-- Кликабельное описание с Collapse -->
+                    <div id="tournament-card" class="card-text text-muted" style="font-size: 13px; cursor: pointer;"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#description-{{ tournament.id }}"
+                        aria-expanded="false"
+                        aria-controls="#description-{{ tournament.id }}">
+                        <!-- Полное описание (скрыто в сложенном состоянии) -->
+                        <div id="description-{{ tournament.id }}" class="collapse partial-collapse">
+                            {{ tournament.description|markdownify:"preview" }}
+                        </div>
+                        <button class="btn btn-link toggle-partial-collapse">
+                        </button>
+                    </div>
+                    
                     <a href="{% url 'tournament_detail' tournament.id %}" class="btn btn-primary">
                         View Details
                     </a>
-                </div>
+                    </div>
             </div>
         </div>
         {% empty %}
@@ -41,4 +55,5 @@
         {% endfor %}
     </div>
 </div>
+
 {% endblock %}
