@@ -1,9 +1,11 @@
+from django import forms
 from django.contrib import admin
 from django.contrib.auth.forms import UserChangeForm
-from django.urls import path, reverse
-from django.utils.html import escape
-from .models import CustomUser, ItemSlot, UserSlot, Customers, TimeSlot, Tournament, TournamentRegistration
+from django.urls import path
 
+from web.admin.forms import TournamentForm
+from web.models import CustomUser, ItemSlot, UserSlot, Customers, TimeSlot, Tournament, TournamentRegistration
+import datetime
 # Register your models here.
 
 @admin.register(Customers)
@@ -32,10 +34,13 @@ class TimeSlotsAdmin(admin.ModelAdmin):
     list_display = ('customer', 'time_slot')
     list_filter = ('time_slot',)
     search_fields = ('customer__name',)
-
-# ТОЛЬКО через декоратор
+    
 @admin.register(Tournament)
 class TournamentAdmin(admin.ModelAdmin):
+    class Media:
+        js = ('js/custom_datetime.js',)
+    form = TournamentForm
+    change_form_template = 'admin/web/tournament/change_form.html'
     list_display = ('name', 'date', 'customer', 'participants_count', 'min_participants')
     filter_horizontal = ('tables',)
     fieldsets = (
@@ -43,13 +48,18 @@ class TournamentAdmin(admin.ModelAdmin):
             'fields': ('customer', 'name', 'date', 'start_time', 'end_time')
         }),
         ('Участники', {
-            'fields': ('min_participants', 'max_participants', 'tables', 'time_slots')
+            'fields': ('min_participants', 'max_participants', 'tables')
         }),
         ('Дополнительно', {
-            'fields': ('registration_deadline', 'description', 'is_canceled', 'is_finished')
+            'fields': ('description', 'is_canceled', 'is_finished', 'is_training')
         }),
     )
-    
+
+    def get_changeform_initial_data(self, request):
+        return {
+            "date": datetime.date.today() + datetime.timedelta(days=1),
+        }
+
     def participants_count(self, obj):
         return f"{obj.participants.count()}/{obj.max_participants}"
 

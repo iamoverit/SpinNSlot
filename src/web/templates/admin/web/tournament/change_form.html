@@ -1,0 +1,10 @@
+{% extends "admin/change_form.html" %}
+
+{% block extrahead %}
+{{ block.super }}
+
+<script>
+    window.TIMESLOT_CHOICES_URL = "{% url 'get_timeslot_choices' %}";
+</script>
+
+{% endblock %}

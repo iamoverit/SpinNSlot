@@ -3,7 +3,7 @@ name = "spinnslot"
 version = "0.1.0"
 description = ""
 authors = [
-    {name = "Ilya Filisteev", email = "ivfilist@mts.ru"}
+    {name = "Ilya Filisteev", email = "ilya.filisteev@gmail.com"}
 ]
 readme = "README.md"
 requires-python = ">=3.10,<4.0"
@@ -12,7 +12,8 @@ dependencies = [
     "python-decouple (>=3.8,<4.0)",
     "django-bootstrap5 (>=24.3,<25.0)",
     "gunicorn (>=23.0.0,<24.0.0)",
-    "django-markdownify (>=0.9.5,<0.10.0)"
+    "django-markdownify (>=0.9.5,<0.10.0)",
+    "requests (>=2.32.3,<3.0.0)",
 ]
 
 [build-system]
@@ -22,4 +23,3 @@ build-backend = "poetry.core.masonry.api"
 [tool.poetry]                                                                                                                                                                                        
 package-mode = false
 
-[tool.poetry.group.dev.dependencies]

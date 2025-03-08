@@ -10,7 +10,7 @@ from django.shortcuts import render
 from django.db.models import Q
 from django.utils import timezone
 from django.contrib import messages
-from .models import Tournament, TournamentRegistration, GuestParticipant
+from .models import Customers, Tournament, TournamentRegistration, GuestParticipant
 from .permissions import staff_or_author_required
 from .validators import validate_telegram_data
 from .models import TimeSlot, ItemSlot, UserSlot, CustomUser
@@ -93,7 +93,7 @@ def index(request):
         
     userSlots = UserSlot.objects.filter(reservation_date=selected_date) \
         .prefetch_related('user', 'table', 'time').all()
-    tournaments = Tournament.objects.filter(date=selected_date) \
+    tournaments = Tournament.objects.filter(date=selected_date, is_canceled=False) \
         .prefetch_related('time_slots', 'tables').all()
     schedule = {}
     for timeSlot in timeSlots:
@@ -200,3 +200,13 @@ def telegram_login(request):
             return redirect('index')
         else:
             return render(request, 'error.html', {'message': 'Invalid Telegram authentication data.'})
+
+def get_timeslot_choices(request):
+    customer_id = request.GET.get('customer_id')
+    customer = get_object_or_404(Customers, id=customer_id)
+    if customer_id:
+        # Фильтруем временные слоты по customer_id
+        time_slots= customer.get_time_slots()
+    else:
+        time_slots = []
+    return JsonResponse({'time_slots': time_slots})

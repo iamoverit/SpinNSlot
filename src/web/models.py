@@ -71,7 +71,14 @@ class Customers(models.Model):
                 customer=self,
             )
             current_time += timedelta(minutes=30)
-
+            
+    def get_time_slots(self):
+        time_slots = self.time_slots.all()
+        result = [{'id': slot.time_slot.strftime('%H:%M'), 'time': slot.time_slot.strftime('%H:%M')} for slot in time_slots]
+        last_time = datetime.combine(datetime.today(), datetime.strptime(result[-1]['time'], "%H:%M").time()) + timedelta(minutes=30)
+        result.append({'id': last_time.strftime('%H:%M'), 'time': last_time.strftime('%H:%M')})
+        return result
+    
 class ItemSlot(models.Model):
     name = models.CharField(max_length=100, unique=True)
     customer = models.ForeignKey(Customers, on_delete=models.CASCADE, related_name="customer")
@@ -115,18 +122,9 @@ class Tournament(models.Model):
         verbose_name="Дедлайн регистрации",
         help_text="Автоматически устанавливается за 2 часа до начала"
     )
-
-    def save(self, *args, **kwargs):
-        # Сначала вычисляем дедлайн
-        start_datetime = timezone.make_aware(
-            datetime.combine(self.date, self.start_time)
-        )
-        self.registration_deadline = start_datetime - timedelta(hours=2)
-        super().save(*args, **kwargs)
-        self.reserve_slots()
-    
     is_canceled = models.BooleanField(default=False, verbose_name="Отменен")
     is_finished = models.BooleanField(default=False, verbose_name="Завершен")
+    is_training = models.BooleanField(default=False, verbose_name="Тренировка")
     description = models.TextField(verbose_name="Описание")
     participants = models.ManyToManyField(
         CustomUser,
@@ -142,6 +140,15 @@ class Tournament(models.Model):
     def __str__(self):
         return f"{self.name} ({self.date} {self.start_time}-{self.end_time})"
 
+    def save(self, *args, **kwargs):
+        # Сначала вычисляем дедлайн
+        start_datetime = timezone.make_aware(
+            datetime.combine(self.date, self.start_time)
+        )
+        self.registration_deadline = start_datetime - timedelta(hours=2)
+        super().save(*args, **kwargs)
+        self.reserve_slots()
+
     def check_available_slots(self):
         """Проверка доступности слотов для турнира"""
         for table in self.tables.all():
@@ -156,20 +163,17 @@ class Tournament(models.Model):
 
     def reserve_slots(self):
         """Бронирование слотов с привязкой к турниру"""
-        if not self.tables.exists() or not self.time_slots.exists():
+        print("reserve_slots_call")
+        if not self.tables.exists():
             return
-
-        for table in self.tables.all():
-            for slot in self.time_slots.filter(customer=self.customer):
-                UserSlot.objects.get_or_create(
-                    user=self.customer.user,
-                    table=table,
-                    time=slot,
-                    reservation_date=self.date,
-                    defaults={  # Добавляем формат "Турнир #{ID} {Название}"
-                        'reason': f'Турнир #{self.id} {self.name}'
-                    }
-                )
+        if self.time_slots.exists():
+            self.time_slots.remove(*[slot.id for slot in self.time_slots.all()])
+        slots = TimeSlot.objects.filter(
+            customer=self.customer,
+            time_slot__gte=self.start_time,
+            time_slot__lt=self.end_time,
+        ).all()
+        self.time_slots.add(*[slot.id for slot in slots])
 
     @property
     def total_participants(self):
@@ -179,10 +183,14 @@ class Tournament(models.Model):
     def check_participants(self):
         total = self.participants.count() + self.guestparticipant_set.count()
         new_status = total < self.min_participants
-        
+
         if self.is_canceled != new_status:
             self.is_canceled = new_status
             self.save(update_fields=['is_canceled'])
+    
+    @staticmethod
+    def get_time_choices():
+        return [(ts.time.strftime('%H:%M'), ts.time.strftime('%H:%M')) for ts in TimeSlot.objects.all()]
 
 class TournamentRegistration(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, verbose_name="Пользователь")
