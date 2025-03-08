@@ -17,7 +17,11 @@
                         {{ tournament.date }} {{ tournament.start_time|time:"H:i" }}-{{ tournament.end_time|time:"H:i" }}
                     </h6>
                     <div class="d-flex justify-content-between align-items-center mb-3">
-                        <div class="progress w-100 me-3" style="height: 20px;">
+                        <div class="progress w-100 me-3" style="height: 20px;"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#participants_list-{{ tournament.id }}"
+                        aria-expanded="false"
+                        aria-controls="#participants_list-{{ tournament.id }}">
                             <div class="progress-bar" 
                                 role="progressbar" 
                                 style="width: {{ tournament.total_participants|percentage:tournament.max_participants }}">
@@ -27,6 +31,14 @@
                         {% if tournament.is_cancelled %}
                         <span class="badge bg-danger">Отменён</span>
                         {% endif %}
+                    </div>
+                    <div id="participants_list-{{ tournament.id }}" class="collapse card text-muted floating-collapse participants_lists">
+                        <h5>Список участников</h5>
+                        <ul>
+                            {% for name in tournament.participants_list %}
+                                <li>{{ name }}</li>
+                            {% endfor %}
+                        </ul>
                     </div>
                     <!-- Кликабельное описание с Collapse -->
                     <div id="tournament-card" class="card-text text-muted" style="font-size: 13px; cursor: pointer;"
@@ -45,7 +57,7 @@
                     <a href="{% url 'tournament_detail' tournament.id %}" class="btn btn-primary">
                         View Details
                     </a>
-                    </div>
+                </div>
             </div>
         </div>
         {% empty %}
@@ -55,5 +67,5 @@
         {% endfor %}
     </div>
 </div>
-
+<script src="{% static 'js/floating_collapse.js' %}"></script>
 {% endblock %}

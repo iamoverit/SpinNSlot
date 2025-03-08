@@ -17,10 +17,10 @@ from .models import TimeSlot, ItemSlot, UserSlot, CustomUser
 from datetime import date, datetime, timedelta
 from django.db import connection
 
-def tournament_list(request):
-    yesterday = datetime.now() - timedelta(days=1)
-    tournaments = Tournament.objects.filter(is_finished=False, is_canceled=False, date__gt=yesterday).all()
-    return render(request, 'tournament_list.html', {'tournaments': tournaments})
+# def tournament_list(request):
+#     yesterday = datetime.now() - timedelta(days=1)
+#     tournaments = Tournament.objects.filter(is_finished=False, is_canceled=False, date__gt=yesterday).all()
+#     return render(request, 'tournament_list.html', {'tournaments': tournaments})
 
 def tournament_detail(request, tournament_id):
     tournament = get_object_or_404(Tournament, pk=tournament_id)
@@ -210,3 +210,13 @@ def get_timeslot_choices(request):
     else:
         time_slots = []
     return JsonResponse({'time_slots': time_slots})
+
+
+def tournament_list(request):
+    yesterday = datetime.now() - timedelta(days=10)
+    tournaments = Tournament.objects.filter(is_finished=False, is_canceled=False, date__gt=yesterday).all()
+    for tournament in tournaments:
+        participants = tournament.tournamentregistration_set.all().values_list('user__username', flat=True)
+        guests = tournament.guestparticipant_set.all().values_list('full_name', flat=True)
+        tournament.participants_list = list(participants) + list(guests)
+    return render(request, 'tournament_list.html', {'tournaments': tournaments})

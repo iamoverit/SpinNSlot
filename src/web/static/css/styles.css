@@ -440,3 +440,15 @@ main {
 #tournament-card[aria-expanded="true"] .toggle-partial-collapse::after {
     transform: translateY(-50%) rotate(180deg); /* Стрелочка вверх */
 }
+
+.floating-collapse {
+    position: absolute;
+    top: 50px;
+    left: 10px;
+    width: 300px;
+    background: #f8f9fa;
+    padding: 10px;
+    border: 1px solid #ddd;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+}
