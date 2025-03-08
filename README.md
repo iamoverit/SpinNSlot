@@ -20,6 +20,9 @@ SpinNSlot is a comprehensive platform that allows users to efficiently manage an
 - Data validation and error handling
 - Reporting and analytics
 
+## Roadmap
+ Please read our [src/README.md](src/README.md) for roadmap details.
+
 ## Technologies
 
 - **Python** - Backend development
