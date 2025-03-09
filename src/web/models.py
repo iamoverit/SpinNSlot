@@ -27,12 +27,7 @@ class CustomUser(AbstractUser):
 
     def __str__(self):
         if self.first_name.strip():
-            return self.first_name + ' ' + self.last_name
-        return self.username
-
-    def get_short_name(self):
-        if self.first_name:
-            return f"{self.first_name[0]}. {self.last_name}" if self.last_name else self.first_name
+            return f"{self.first_name} {self.last_name}" if self.last_name else self.first_name
         return self.username
 
 class Customers(models.Model):

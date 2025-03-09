@@ -35,7 +35,7 @@
                                 {% if userSlot.user.id == user.id %}
                                     You
                                 {% else %}
-                                    {{ userSlot }}
+                                    {{ userSlot.user }}
                                 {% endif %}
                                 {% if userSlot.user.id == user.id or user.is_staff or user.is_superuser %}
                                     <a href="{% url 'unbook_slot' userSlot.id %}?date={{ selected_date|date:'Y-m-d' }}" 
