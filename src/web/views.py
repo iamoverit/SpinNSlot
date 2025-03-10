@@ -1,3 +1,4 @@
+from collections import defaultdict
 import json
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
@@ -79,7 +80,36 @@ def add_guest_participant(request, tournament_id):
     
     return redirect('tournament_detail', tournament_id=tournament_id)
 
+def prepare_schedule(schedule, timeSlots, itemSlots):
+    merged_cells = {}  # Словарь для хранения объединенных ячеек
+
+    # Создаем структуру с флагами объединения
+    for i, timeSlot in enumerate(timeSlots):
+        for j, itemSlot in enumerate(itemSlots):
+            userSlot = schedule.get(timeSlot.id, {}).get(itemSlot.id, None)
+            if not userSlot:
+                continue  # Пропускаем пустые ячейки
+            
+            # Если уже объединена, пропускаем
+            if (i, j) in merged_cells:
+                continue
+
+            # Проверяем возможность объединения по горизонтали (вправо)
+            for next_j in range(j, len(itemSlots)):
+                for next_i in range(i, len(timeSlots)):
+                    next_slot = schedule.get(timeSlots[next_i].id, {}).get(itemSlot.id, None)
+                    if next_slot["type"] == userSlot["type"] and userSlot["type"] == "tournament" and next_slot["compare_by"] == userSlot["compare_by"]:
+                        userSlot["colspan"] = next_j - j + 1
+                        userSlot["rowspan"] = next_i - i + 1
+                        merged_cells[(next_i, next_j)] = True  # Отмечаем ячейку как объединенную
+                    else:
+                        break  # Прерываем, если следующий слот отличается
+
+            userSlot["merged"] = True  # По умолчанию не объединена
+    return schedule
+
 def index(request):
+    # TODO: add filter by customer here:
     timeSlots = TimeSlot.objects.all()
     itemSlots = ItemSlot.objects.all()
 
@@ -90,28 +120,45 @@ def index(request):
             selected_date = date.today()
     except ValueError:
         selected_date = date.today()
-        
+
     userSlots = UserSlot.objects.filter(reservation_date=selected_date) \
         .prefetch_related('user', 'table', 'time').all()
     tournaments = Tournament.objects.filter(date=selected_date, is_canceled=False) \
         .prefetch_related('time_slots', 'tables').all()
     schedule = {}
     for timeSlot in timeSlots:
-        schedule[timeSlot] = {}
+        schedule[timeSlot.id] = {}
         for itemSlot in itemSlots:
             reserved_user = next((userSlot for userSlot in userSlots if userSlot.time == timeSlot and userSlot.table == itemSlot), None)
             reserved_tournament = next((tournament for tournament in tournaments if timeSlot in tournament.time_slots.all() and itemSlot in tournament.tables.all()), None)
-            schedule[timeSlot][itemSlot] = None
             if reserved_user:
-                schedule[timeSlot][itemSlot] = reserved_user
-            if reserved_tournament:
-                schedule[timeSlot][itemSlot] = reserved_tournament
-                
+                schedule[timeSlot.id][itemSlot.id] = {
+                    "type": "user",
+                    "reserved_by": reserved_user,
+                    "compare_by": reserved_user.user.id,
+                    "colspan": 1,
+                    "rowspan": 1,
+                }
+            elif reserved_tournament:
+                schedule[timeSlot.id][itemSlot.id] =  {
+                    "type": "tournament",
+                    "reserved_by": reserved_tournament,
+                    "compare_by": reserved_tournament.id,
+                    "colspan": 1,
+                    "rowspan": 1,
+                }
+            else:
+                schedule[timeSlot.id][itemSlot.id] = {
+                    "type": 'free',
+                    "reserved_by": None,
+                    "colspan": 1,
+                    "rowspan": 1,
+                }
 
     context = {
         'timeSlots': timeSlots,
         'itemSlots': itemSlots,
-        'schedule': schedule,
+        'schedule': prepare_schedule(schedule, timeSlots, itemSlots),
         'selected_date': selected_date,
         'today': date.today(),
     }

@@ -1,58 +1,17 @@
+@media (max-width: 768px) {                                                                                                           
+    .date-picker-container {                                                                                                          
+        flex-direction: column;                                                                                                       
+        align-items: flex-start;                                                                                                      
+    }                                                                                                                                 
+    .selected-date {                                                                                                                  
+        margin-top: 10px;                                                                                                             
+    }
+}
+
 body {
     font-family: "Lucida Grande","Lucida Sans Unicode",Arial,Helvetica,Verdana,sans-serif; /* Изменяет шрифт для всего документа */
 }
-.booking-table-div {
-    display: flex;
-    justify-content: center;
-    background-color: #f5f5f5;
-    padding: 20px;
-    margin-bottom: 20px;
-    min-height: calc(100vh - 160px); /* 100vh минус высота хедера и футера */
-    overflow-y: auto;
-}
-.booking-table {
-    border-collapse: collapse;
-    width: 100%;
-    background: white;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    table-layout: fixed;
-}
 
-.booking-table th,
-.booking-table td {
-    width: 150px; /* Фиксированная ширина столбцов */
-    max-width: 150px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
-.booking-table th:first-child,
-.booking-table td:first-child {
-    width: 100px; /* Уменьшенная ширина для первого столбца с временем */
-}
-.booking-table th, .booking-table td {
-    border: 1px solid #ddd;
-    text-align: center;
-    padding: 8px;
-}
-.booking-table th {
-    background-color: #4CAF50;
-    color: white;
-}
-.time-slot {
-    background-color: #f9f9f9;
-    font-weight: bold;
-}
-.available {
-    background-color: #dff0d8;
-    color: #3c763d;
-    cursor: pointer;
-}
-.booked {
-    background-color: #f2dede;
-    color: #a94442;
-}
 .circle-image {
     display: inline-block;
     vertical-align: top;
@@ -243,12 +202,7 @@ body {
     user-select: none; /* Запрет выделения текста */
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Легкая тень */
 }
-.booking-table .reserved {
-    background-color: #ffcccc; /* Красный для зарезервированных */
-}
-.booking-table .user_reserved {
-    background-color: #f1ffcc; /* Желтый для зарезервированных текущим пользователем */
-}
+
 /* Footer styles */
 .footer {
     position: relative;
@@ -265,10 +219,6 @@ main {
     min-height: 100vh;
 }
 
-.booking-table .free {
-    background-color: #ccffcc; /* Зелёный для свободных */
-}
-
 .book-btn {
     background-color: #4CAF50; /* Приятный зеленый */
     border-color: #45a049;
@@ -283,6 +233,33 @@ main {
 .book-btn:active {
     background-color: #3d8b40; /* Еще темнее при нажатии */
     transform: scale(0.98);
+}
+
+.cancel-btn {
+    top: 0; 
+    right: 0; 
+    /* transform: translate(50%, -50%);  */
+    width: 28px; 
+    height: 28px; 
+    display: flex; 
+    align-items: center;
+    justify-content: center;
+    background-color: #ff4d4d;
+    color: white;
+    font-size: 10px;
+    font-weight: bold;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+.cancel-btn:hover {
+    background-color: #e63939;
+}
+.cancel-btn:active {
+    background-color: #cc3333;
+    transform: scale(0.95);
 }
 
 .date-picker-container {
@@ -341,29 +318,6 @@ main {
     font-size: 14px;
 }
 
-.cancel-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    background-color: #ff4d4d;
-    color: white;
-    font-size: 10px;
-    font-weight: bold;
-    border: none;
-    border-radius: 50%;
-    width: 20px;
-    height: 20px;
-    cursor: pointer;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    transition: background-color 0.3s ease, transform 0.2s ease;
-}
-.cancel-btn:hover {
-    background-color: #e63939;
-}
-.cancel-btn:active {
-    background-color: #cc3333;
-    transform: scale(0.95);
-}
 
 .badge.bg-primary {
     font-size: 0.75em;
