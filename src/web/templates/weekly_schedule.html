@@ -44,11 +44,21 @@
                             </button>
                         </div>
                     {% elif userSlot.type == 'tournament' %}
-                        <div class="" style="grid-row: span {{ userSlot.rowspan }}; grid-column: span {{ userSlot.colspan }};">
+                        <div class="w-100 h-100 d-flex align-items-center justify-content-center flex-shrink-0 position-relative" style="grid-row: span {{ userSlot.rowspan }}; grid-column: span {{ userSlot.colspan }};">
                             <a href="{% url 'tournament_detail' userSlot.reserved_by.id %}" 
                             class="btn p-0 rounded-0 bg-gradient btn-{% if userSlot.reserved_by.is_training %}info{% else %}warning{% endif %} w-100 h-100 d-flex align-items-center justify-content-center flex-shrink-0"
-                            style="min-width: 0; font-size: clamp(11px, 2vw, 16px);" 
+                            style="min-width: 0; font-size: clamp(11px, 2vw, 16px);"
                             data-time="{{ userSlot.id }}">{{userSlot.reserved_by.name}}</a>
+                            <div
+                            class="btn btn-outline-success border-0 position-absolute top-0 end-0 d-flex align-items-center justify-content-center flex-shrink-0 pe-1 pt-0"
+                            style="min-width: 0; filter: hue-rotate(90deg) saturate(000%); ;font-size: clamp(11px, 2vw, 16px);"
+                            id="participants_list-{{ userSlot.reserved_by.id }}" data-bs-toggle="dropdown">&#128100; {{ userSlot.reserved_by.total_participants }}</div>
+                            <ul class="dropdown-menu" aria-labelledby="participants_list-{{ userSlot.reserved_by.id }}">
+                                <li><h6 class="dropdown-header">Participants list</h6></li>
+                                {% for name in userSlot.reserved_by.participants_list %}
+                                    <li><a class="dropdown-item" href="#">{{ name }}</a></li>
+                                {% endfor %}
+                            </ul>
                         </div>
                     {% else %}
                         <div class="free d-flex align-items-center justify-content-center">
@@ -68,25 +78,6 @@
 </main>
 
 <script>
-    // Функция для показа/скрытия подменю
-    function toggleMenu() {
-        const menu = document.getElementById('dropdownMenu');
-        menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
-    }
-
-    function logout() {
-        window.location.href = '/logout';
-    }
-
-    // Закрытие подменю при клике вне его области
-    document.addEventListener('click', function (event) {
-        const menu = document.getElementById('dropdownMenu');
-        const trigger = document.querySelector('.menu-trigger');
-        if (!menu.contains(event.target) && !trigger.contains(event.target)) {
-        menu.style.display = 'none';
-        }
-    });
-
     document.addEventListener('DOMContentLoaded', function() {
         const datePicker = document.getElementById('date-picker');
         
@@ -98,6 +89,7 @@
             window.location.href = newUrl;
         });
     });
-    </script>
+</script>
+<script src="{% static 'js/floating_collapse.js' %}"></script>
 {% endblock %}
 

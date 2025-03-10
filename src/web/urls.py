@@ -1,4 +1,5 @@
 from django.urls import path
+from django.contrib.auth import views as auth_views
 from . import views
 
 urlpatterns = [
@@ -16,4 +17,5 @@ urlpatterns = [
     path('tournaments/<int:tournament_id>/', views.tournament_detail, name='tournament_detail'),
     path('tournaments/<int:tournament_id>/register/', views.register_tournament, name='register_tournament'),
     path('tournaments/<int:tournament_id>/add-guest/', views.add_guest_participant, name='add_guest'),
+    path('logout/', auth_views.LogoutView.as_view(), name='logout'),
 ]

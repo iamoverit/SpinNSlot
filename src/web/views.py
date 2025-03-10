@@ -101,6 +101,12 @@ def daily_schedule(request, selected_date_str=None):
         .prefetch_related('user', 'table', 'time').all()
     tournaments = Tournament.objects.filter(date=selected_date, is_canceled=False) \
         .prefetch_related('time_slots', 'tables').all()
+    
+    for tournament in tournaments:
+        participants = tournament.tournamentregistration_set.all().values_list('user__username', flat=True)
+        guests = tournament.guestparticipant_set.all().values_list('full_name', flat=True)
+        tournament.participants_list = list(participants) + list(guests)
+
     schedule = {}
     for timeSlot in timeSlots:
         schedule[timeSlot.id] = {}
@@ -155,6 +161,10 @@ def weekly_schedule(request, selected_date_str=None):
 
     tournaments = Tournament.objects.filter(date__range=(monday, sunday), is_canceled=False) \
         .prefetch_related('time_slots', 'tables').all()
+    for tournament in tournaments:
+        participants = tournament.tournamentregistration_set.all().values_list('user__username', flat=True)
+        guests = tournament.guestparticipant_set.all().values_list('full_name', flat=True)
+        tournament.participants_list = list(participants) + list(guests)
     schedule = {}
 
     days = []

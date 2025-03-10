@@ -17,29 +17,27 @@
                         {{ tournament.date }} {{ tournament.start_time|time:"H:i" }}-{{ tournament.end_time|time:"H:i" }}
                     </h6>
                     <div class="d-flex justify-content-between align-items-center mb-3">
-                        <div class="progress w-100 me-3" style="height: 20px;"
-                        data-bs-toggle="collapse"
-                        data-bs-target="#participants_list-{{ tournament.id }}"
-                        aria-expanded="false"
-                        aria-controls="#participants_list-{{ tournament.id }}">
+                        <div class="btn w-100 p-0">
+                        <div class="progress w-100 me-3 p-0" style="height: 20px;"
+                        id="participants_list-{{ tournament.id }}" data-bs-toggle="dropdown">
                             <div class="progress-bar" 
                                 role="progressbar" 
                                 style="width: {{ tournament.total_participants|percentage:tournament.max_participants }}">
                                 {{ tournament.total_participants }}/{{ tournament.max_participants }}
                             </div>
+                            <ul class="dropdown-menu" aria-labelledby="participants_list-{{ tournament.id }}">
+                                <li><h6 class="dropdown-header">Participants list</h6></li>
+                                {% for name in tournament.participants_list %}
+                                    <li><a class="dropdown-item" href="#">{{ name }}</a></li>
+                                {% endfor %}
+                            </ul>
                         </div>
+                    </div>
                         {% if tournament.is_cancelled %}
-                        <span class="badge bg-danger">Отменён</span>
+                        <span class="badge bg-danger">Canceled</span>
                         {% endif %}
                     </div>
-                    <div id="participants_list-{{ tournament.id }}" class="collapse card text-muted floating-collapse participants_lists">
-                        <h5>Список участников</h5>
-                        <ul>
-                            {% for name in tournament.participants_list %}
-                                <li>{{ name }}</li>
-                            {% endfor %}
-                        </ul>
-                    </div>
+
                     <!-- Кликабельное описание с Collapse -->
                     <div id="tournament-card" class="card-text text-muted" style="font-size: 13px; cursor: pointer;"
                         data-bs-toggle="collapse"
@@ -53,8 +51,7 @@
                         <button class="btn btn-link toggle-partial-collapse">
                         </button>
                     </div>
-                    
-                    <a href="{% url 'tournament_detail' tournament.id %}" class="btn btn-primary">
+                    <a href="{% url 'tournament_detail' tournament.id %}" class="btn btn-primary btn-sm">
                         View Details
                     </a>
                 </div>

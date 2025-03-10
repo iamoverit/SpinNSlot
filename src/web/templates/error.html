@@ -26,24 +26,5 @@
 
     {% include 'footer.html' %}
     {% bootstrap_javascript %}
-    <script>
-        // Header scripts
-        function toggleMenu() {
-            const menu = document.getElementById('dropdownMenu');
-            menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
-        }
-
-        function logout() {
-            window.location.href = '/logout';
-        }
-
-        document.addEventListener('click', function (event) {
-            const menu = document.getElementById('dropdownMenu');
-            const trigger = document.querySelector('.menu-trigger');
-            if (!menu.contains(event.target) && !trigger.contains(event.target)) {
-                menu.style.display = 'none';
-            }
-        });
-    </script>
 </body>
 </html>
