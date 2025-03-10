@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+{% load custom_filters %}
+{% load static %}
+
+{% block content %}
+
+<main class="content container-fluid p-0">
+<!-- your app -->
+    <div class="date-picker-container">
+        <label for="date-picker">Select Date:</label>
+        <input type="date" id="date-picker" value="{{ selected_date|date:'Y-m-d' }}" min="{{ today|date:'Y-m-d' }}" data-url="{% url 'daily_schedule' '0000-00-00' %}">
+        <span class="selected-date">
+            Showing reservations for: 
+            <strong>{{ selected_date|date:"F j, Y" }}</strong>
+        </span>
+    </div>
+
+    <div class="container-fluid p-0">
+        <div class="d-grid" style="grid-template-columns: minmax(20px, auto) {% for item in itemSlots %} 1fr{% endfor %}; grid-template-rows: repeat({{ timeSlots|length }}, 1fr); gap: 0px;">
+            <div class=""></div>
+            {% for itemSlot in itemSlots %}
+                <div class="disabled border-bottom w-100 h-100 d-flex align-items-center justify-content-center">{{ itemSlot.name|slugify }}</div>
+            {% endfor %}
+            {% for timeSlot in timeSlots %}
+                <div class="border-end w-100 h-100 d-flex align-items-center justify-content-center">{{ timeSlot.time_slot|time:"H:i" }}</div>
+                {% for itemSlot in itemSlots %}
+                    {% with schedule|get:timeSlot.id|get:itemSlot.id as userSlot %}
+                    {% if userSlot and userSlot.merged %}
+                    {% if userSlot.type == 'user' %}
+                        <div class="position-relative flex-shrink-0"
+                        style="min-width: 0;">
+                            <button class="btn bg-gradient {% if userSlot.reserved_by.user.id == user.id %}btn-info{% else %}btn-warning{% endif %} w-100 h-100 d-flex align-items-center justify-content-center flex-shrink-0"
+                            style="min-width: 0; font-size: clamp(12px, 2vw, 16px);" aria-disabled="true">
+                            {% if userSlot.user.id == user.id or user.is_staff or user.is_superuser %}
+                            <a href="{% url 'unbook_slot' userSlot.reserved_by.id %}" 
+                            class="btn btn-primary cancel-btn position-absolute">&#10006;</a>
+                            {% endif %}
+                            {% if userSlot.reserved_by.user.id == user.id %}
+                                You <span class="reserved-icon">✔</span>
+                            {% else %}
+                                {{ userSlot.reserved_by.user }}
+                            {% endif %}
+                            </button>
+                        </div>
+                    {% elif userSlot.type == 'tournament' %}
+                        <div class="" style="grid-row: span {{ userSlot.rowspan }}; grid-column: span {{ userSlot.colspan }};">
+                            <a href="{% url 'tournament_detail' userSlot.reserved_by.id %}" 
+                            class="btn btn-primary bg-gradient w-100 h-100 d-flex align-items-center justify-content-center " 
+                            data-time="{{ userSlot.id }}">{{userSlot.reserved_by.name}}</a>
+                        </div>
+                    {% else %}
+                        <div class="free d-flex align-items-center justify-content-center">
+                        <a href="{% url 'book_slot' timeSlot.id itemSlot.id selected_date|date:'Y-m-d' %}" 
+                            class="btn btn-outline-success bg-gradient border-0 w-100 h-100" 
+                            data-time="{{ timeSlot.id }}" 
+                            data-item="{{ itemSlot.id }}">Book</a>
+                        </div>
+                    {% endif %}
+                    {% endif %}
+                    {% endwith %}
+                {% endfor %}
+            {% endfor %}
+        </div>
+    </div>
+</main>
+
+<script>
+    // Функция для показа/скрытия подменю
+    function toggleMenu() {
+        const menu = document.getElementById('dropdownMenu');
+        menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+    }
+
+    function logout() {
+        window.location.href = '/logout';
+    }
+
+    // Закрытие подменю при клике вне его области
+    document.addEventListener('click', function (event) {
+        const menu = document.getElementById('dropdownMenu');
+        const trigger = document.querySelector('.menu-trigger');
+        if (!menu.contains(event.target) && !trigger.contains(event.target)) {
+        menu.style.display = 'none';
+        }
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const datePicker = document.getElementById('date-picker');
+        
+        // Update page when date changes
+        datePicker.addEventListener('change', function() {
+            const selectedDate = this.value;
+            const baseUrl = this.dataset.url;
+            const newUrl = baseUrl.replace('0000-00-00', selectedDate);
+            window.location.href = newUrl;
+        });
+    });
+    </script>
+{% endblock %}
+

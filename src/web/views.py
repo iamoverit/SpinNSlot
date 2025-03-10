@@ -1,5 +1,4 @@
-from collections import defaultdict
-import json
+import datetime
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
@@ -11,17 +10,23 @@ from django.shortcuts import render
 from django.db.models import Q
 from django.utils import timezone
 from django.contrib import messages
+
+from web.utils import DaySlot, get_week_range, prepare_schedule, week_date_iterator
 from .models import Customers, Tournament, TournamentRegistration, GuestParticipant
 from .permissions import staff_or_author_required
 from .validators import validate_telegram_data
 from .models import TimeSlot, ItemSlot, UserSlot, CustomUser
-from datetime import date, datetime, timedelta
+
 from django.db import connection
 
-# def tournament_list(request):
-#     yesterday = datetime.now() - timedelta(days=1)
-#     tournaments = Tournament.objects.filter(is_finished=False, is_canceled=False, date__gt=yesterday).all()
-#     return render(request, 'tournament_list.html', {'tournaments': tournaments})
+def tournament_list(request):
+    yesterday = datetime.datetime.now() - datetime.timedelta(days=10)
+    tournaments = Tournament.objects.filter(is_finished=False, is_canceled=False, date__gt=yesterday).all()
+    for tournament in tournaments:
+        participants = tournament.tournamentregistration_set.all().values_list('user__username', flat=True)
+        guests = tournament.guestparticipant_set.all().values_list('full_name', flat=True)
+        tournament.participants_list = list(participants) + list(guests)
+    return render(request, 'tournament_list.html', {'tournaments': tournaments})
 
 def tournament_detail(request, tournament_id):
     tournament = get_object_or_404(Tournament, pk=tournament_id)
@@ -80,46 +85,17 @@ def add_guest_participant(request, tournament_id):
     
     return redirect('tournament_detail', tournament_id=tournament_id)
 
-def prepare_schedule(schedule, timeSlots, itemSlots):
-    merged_cells = {}  # Словарь для хранения объединенных ячеек
-
-    # Создаем структуру с флагами объединения
-    for i, timeSlot in enumerate(timeSlots):
-        for j, itemSlot in enumerate(itemSlots):
-            userSlot = schedule.get(timeSlot.id, {}).get(itemSlot.id, None)
-            if not userSlot:
-                continue  # Пропускаем пустые ячейки
-            
-            # Если уже объединена, пропускаем
-            if (i, j) in merged_cells:
-                continue
-
-            # Проверяем возможность объединения по горизонтали (вправо)
-            for next_j in range(j, len(itemSlots)):
-                for next_i in range(i, len(timeSlots)):
-                    next_slot = schedule.get(timeSlots[next_i].id, {}).get(itemSlot.id, None)
-                    if next_slot["type"] == userSlot["type"] and userSlot["type"] == "tournament" and next_slot["compare_by"] == userSlot["compare_by"]:
-                        userSlot["colspan"] = next_j - j + 1
-                        userSlot["rowspan"] = next_i - i + 1
-                        merged_cells[(next_i, next_j)] = True  # Отмечаем ячейку как объединенную
-                    else:
-                        break  # Прерываем, если следующий слот отличается
-
-            userSlot["merged"] = True  # По умолчанию не объединена
-    return schedule
-
-def index(request):
+def daily_schedule(request, selected_date_str=None):
     # TODO: add filter by customer here:
     timeSlots = TimeSlot.objects.all()
     itemSlots = ItemSlot.objects.all()
 
-    selected_date_str = request.GET.get('date')
     try:
-        selected_date = date.fromisoformat(selected_date_str) if selected_date_str else date.today()
-        if selected_date < date.today():
-            selected_date = date.today()
+        selected_date = datetime.date.fromisoformat(selected_date_str) if selected_date_str else datetime.date.today()
+        if selected_date < datetime.date.today():
+            selected_date = datetime.date.today()
     except ValueError:
-        selected_date = date.today()
+        selected_date = datetime.date.today()
 
     userSlots = UserSlot.objects.filter(reservation_date=selected_date) \
         .prefetch_related('user', 'table', 'time').all()
@@ -160,9 +136,61 @@ def index(request):
         'itemSlots': itemSlots,
         'schedule': prepare_schedule(schedule, timeSlots, itemSlots),
         'selected_date': selected_date,
-        'today': date.today(),
+        'today': datetime.date.today(),
     }
-    return render(request, 'index.html', context)
+    return render(request, 'daily_schedule.html', context)
+
+
+def weekly_schedule(request, selected_date_str=None):
+    # TODO: add filter by customer here:
+    timeSlots = TimeSlot.objects.all()
+
+    try:
+        selected_date = datetime.date.fromisoformat(selected_date_str) if selected_date_str else datetime.date.today()
+        if selected_date < datetime.date.today():
+            selected_date = datetime.date.today()
+    except ValueError:
+        selected_date = datetime.date.today()
+    monday, sunday = get_week_range(selected_date)
+
+    tournaments = Tournament.objects.filter(date__range=(monday, sunday), is_canceled=False) \
+        .prefetch_related('time_slots', 'tables').all()
+    schedule = {}
+
+    days = []
+    for i, day in enumerate(week_date_iterator(monday, sunday)):
+        days.append(DaySlot(i, day))
+
+    for timeSlot in timeSlots:
+        schedule[timeSlot.id] = {}
+        for day in days:
+            reserved_tournament = next((tournament for tournament in tournaments if timeSlot in tournament.time_slots.all() and day.day == tournament.date), None)
+            if reserved_tournament:
+                schedule[timeSlot.id][day.id] =  {
+                    "type": "tournament",
+                    "reserved_by": reserved_tournament,
+                    "compare_by": reserved_tournament.id,
+                    "colspan": 1,
+                    "rowspan": 1,
+                }
+            else:
+                schedule[timeSlot.id][day.id] = {
+                    "type": 'free',
+                    "reserved_by": None,
+                    "colspan": 1,
+                    "rowspan": 1,
+                }
+        # print([monday + timedelta(days=i) for i in range((sunday - monday).days + 1)])
+              
+    context = {
+        'week_range': (monday, sunday),
+        'timeSlots': timeSlots,
+        'days': days,
+        'schedule': prepare_schedule(schedule, timeSlots, days),
+        'selected_date': selected_date,
+        'today': datetime.date.today(),
+    }
+    return render(request, 'weekly_schedule.html', context)
 
 @login_required
 def register_tournament(request, tournament_id):
@@ -178,17 +206,16 @@ def register_tournament(request, tournament_id):
     return redirect('tournament_detail', tournament_id=tournament.id)
 
 @login_required
-def book_slot(request, time_slot_id, item_slot_id):
+def book_slot(request, time_slot_id, item_slot_id, reservation_date_str):
     time_slot = get_object_or_404(TimeSlot, id=time_slot_id)
     item_slot = get_object_or_404(ItemSlot, id=item_slot_id)
     
-    reservation_date_str = request.GET.get('date')
     try:
-        reservation_date = date.fromisoformat(reservation_date_str) if reservation_date_str else date.today()
-        if reservation_date < date.today():
-            reservation_date = date.today()
+        reservation_date = datetime.date.fromisoformat(reservation_date_str) if reservation_date_str else datetime.date.today()
+        if reservation_date < datetime.date.today():
+            reservation_date = datetime.date.today()
     except ValueError:
-        reservation_date = date.today()
+        reservation_date = datetime.date.today()
     try:
         if UserSlot.objects.filter(time=time_slot, table=item_slot, reservation_date=reservation_date).exists():
             return render(request, 'error.html', {'message': 'This slot is already booked for the selected date!'})
@@ -258,12 +285,3 @@ def get_timeslot_choices(request):
         time_slots = []
     return JsonResponse({'time_slots': time_slots})
 
-
-def tournament_list(request):
-    yesterday = datetime.now() - timedelta(days=10)
-    tournaments = Tournament.objects.filter(is_finished=False, is_canceled=False, date__gt=yesterday).all()
-    for tournament in tournaments:
-        participants = tournament.tournamentregistration_set.all().values_list('user__username', flat=True)
-        guests = tournament.guestparticipant_set.all().values_list('full_name', flat=True)
-        tournament.participants_list = list(participants) + list(guests)
-    return render(request, 'tournament_list.html', {'tournaments': tournaments})

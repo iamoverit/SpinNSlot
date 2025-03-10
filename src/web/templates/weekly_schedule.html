@@ -4,41 +4,34 @@
 
 {% block content %}
 
-<style>
-    .rowspan {
-        height: 100%; /* Высота на 2 строки */
-        display: flex;
-        align-items: center; /* Выравнивание текста */
-    }
-</style>
-
-<main class="content container">
+<main class="content container-fluid p-0">
 <!-- your app -->
     <div class="date-picker-container">
         <label for="date-picker">Select Date:</label>
-        <input type="date" id="date-picker" value="{{ selected_date|date:'Y-m-d' }}" min="{{ today|date:'Y-m-d' }}">
+        <input type="date" id="date-picker" value="{{ selected_date|date:'Y-m-d' }}" min="{{ today|date:'Y-m-d' }}" data-url="{% url 'weekly_schedule' '0000-00-00' %}">
         <span class="selected-date">
             Showing reservations for: 
             <strong>{{ selected_date|date:"F j, Y" }}</strong>
         </span>
     </div>
 
-    <div class="container">
-        <div class="d-grid" style="grid-template-columns: minmax(60px, auto) {% for item in itemSlots %} 1fr{% endfor %}; grid-template-rows: repeat({{ timeSlots|length }}, 1fr); gap: 2px;">
+    <div class="container-fluid p-0">
+        <div class="d-grid" style="grid-template-columns: minmax(10px, auto) {% for day in days %} 1fr{% endfor %}; grid-template-rows: repeat({{ timeSlots|length }}, 1fr); gap: -1px;">
             <div class=""></div>
-            {% for itemSlot in itemSlots %}
-                <div class="disabled w-100 h-100 d-flex align-items-center justify-content-center">{{ itemSlot.name|slugify }}</div>
+            {% for day in days %}
+                <div class="disabled border-bottom w-100 h-100 d-flex align-items-center justify-content-center flex-shrink-0"
+                            style="min-width: 0; font-size: clamp(11px, 2vw, 16px);">{{ day.day|date:"d-m-y" }}</div>
             {% endfor %}
             {% for timeSlot in timeSlots %}
-                <div class="w-100 h-100 d-flex align-items-center justify-content-center">{{ timeSlot.time_slot|time:"H:i" }}</div>
-                {% for itemSlot in itemSlots %}
-                    {% with schedule|get:timeSlot.id|get:itemSlot.id as userSlot %}
+                <div class="border-end w-100 h-100 d-flex align-items-center justify-content-center flex-shrink-0"
+                            style="z-index: 1000; min-width: 0; font-size: clamp(11px, 2vw, 16px);">{{ timeSlot.time_slot|time:"H:i" }}</div>
+                {% for day in days %}
+                    {% with schedule|get:timeSlot.id|get:day.id as userSlot %}
                     {% if userSlot and userSlot.merged %}
                     {% if userSlot.type == 'user' %}
-                        <div class="position-relative flex-shrink-0"
-                        style="min-width: 0;">
-                            <button class="btn {% if userSlot.reserved_by.user.id == user.id %}btn-info{% else %}btn-warning{% endif %} w-100 h-100 d-flex align-items-center justify-content-center flex-shrink-0"
-                            style="min-width: 0; font-size: clamp(12px, 2vw, 16px);" aria-disabled="true">
+                        <div class="position-relative p-0 flex-shrink-0" style="min-width: 0;">
+                            <button class="btn btn-{% if userSlot.reserved_by.user.id == user.id %}info{% else %}warning{% endif %} w-100 h-100 d-flex align-items-center justify-content-center flex-shrink-0"
+                            style="min-width: 0; font-size: clamp(11px, 2vw, 16px);" aria-disabled="true">
                             {% if userSlot.user.id == user.id or user.is_staff or user.is_superuser %}
                             <a href="{% url 'unbook_slot' userSlot.reserved_by.id %}?date={{ selected_date|date:'Y-m-d' }}" 
                             class="btn btn-primary cancel-btn position-absolute">&#10006;</a>
@@ -53,15 +46,17 @@
                     {% elif userSlot.type == 'tournament' %}
                         <div class="" style="grid-row: span {{ userSlot.rowspan }}; grid-column: span {{ userSlot.colspan }};">
                             <a href="{% url 'tournament_detail' userSlot.reserved_by.id %}" 
-                            class="btn btn-primary w-100 h-100 d-flex align-items-center justify-content-center " 
+                            class="btn p-0 rounded-0 bg-gradient btn-{% if userSlot.reserved_by.is_training %}info{% else %}warning{% endif %} w-100 h-100 d-flex align-items-center justify-content-center flex-shrink-0"
+                            style="min-width: 0; font-size: clamp(11px, 2vw, 16px);" 
                             data-time="{{ userSlot.id }}">{{userSlot.reserved_by.name}}</a>
                         </div>
                     {% else %}
                         <div class="free d-flex align-items-center justify-content-center">
-                        <a href="{% url 'book_slot' timeSlot.id itemSlot.id %}?date={{ selected_date|date:'Y-m-d' }}" 
-                            class="btn btn-success w-100 h-100" 
+                        <a href="{% url 'daily_schedule' day.day|date:'Y-m-d' %}" 
+                            class="btn btn-outline-success border-0 w-100 h-100 d-flex align-items-center justify-content-center flex-shrink-0"
+                            style="min-width: 0; font-size: clamp(11px, 2vw, 16px);"
                             data-time="{{ timeSlot.id }}" 
-                            data-item="{{ itemSlot.id }}">Book</a>
+                            data-item="{{ day }}">Rent</a>
                         </div>
                     {% endif %}
                     {% endif %}
@@ -98,24 +93,9 @@
         // Update page when date changes
         datePicker.addEventListener('change', function() {
             const selectedDate = this.value;
-            // Update URL with selected date
-            const url = new URL(window.location.href);
-            url.searchParams.set('date', selectedDate);
-            window.location.href = url.toString();
-        });
-        const bookButtons = document.querySelectorAll('.book-btn');
-        
-        datePicker.addEventListener('onLoad', function() {
-            const selectedDate = this.value;
-            
-            bookButtons.forEach(button => {
-                const timeSlotId = button.dataset.time;
-                const itemSlotId = button.dataset.item;
-                button.href = `{% url 'book_slot' 0 0 %}`
-                    .replace('/0/', `/${timeSlotId}/`)
-                    .replace('/0/', `/${itemSlotId}/`) 
-                    + `?date=${selectedDate}`;
-            });
+            const baseUrl = this.dataset.url;
+            const newUrl = baseUrl.replace('0000-00-00', selectedDate);
+            window.location.href = newUrl;
         });
     });
     </script>

@@ -15,10 +15,13 @@
                     </li>
                     {% endif %}
                     <li class="nav-item">
-                        <a class="nav-link {% if request.path == '/' %}active{% endif %}" href="{% url 'index' %}">Home</a>
+                        <a class="nav-link {% if '/weekly-schedule/' in request.path %}active{% endif %}" href="{% url 'weekly_schedule' %}">Weekly schedule</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link {% if request.path == '/tournaments/' %}active{% endif %}" href="{% url 'tournament_list' %}">Tournaments</a>
+                        <a class="nav-link {% if '/daily-schedule/' in request.path %}active{% endif %}" href="{% url 'daily_schedule' %}">Daily schedule</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if '/tournaments/' in request.path %}active{% endif %}" href="{% url 'tournament_list' %}">Tournaments</a>
                     </li>
                 </ul>
                 <div class="user-info">

@@ -158,9 +158,6 @@ class Tournament(models.Model):
 
     def reserve_slots(self):
         """Бронирование слотов с привязкой к турниру"""
-        print("reserve_slots_call")
-        if not self.tables.exists():
-            return
         if self.time_slots.exists():
             self.time_slots.remove(*[slot.id for slot in self.time_slots.all()])
         slots = TimeSlot.objects.filter(
