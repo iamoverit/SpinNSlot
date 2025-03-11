@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import Q
 from django.contrib.auth.models import User
 from django.contrib.auth.models import AbstractUser
 from datetime import timedelta, datetime
@@ -58,12 +59,12 @@ class Customers(models.Model):
         self.update_time_slots()
 
     def update_time_slots(self):
-        TimeSlot.objects.filter(customer=self).delete()
         current_time = datetime.combine(datetime.today(), self.working_hours_start)
         end_time = datetime.combine(datetime.today(), self.working_hours_end)
-
+        old_time_slots= TimeSlot.objects.filter(~Q(time_slot__gte=current_time) | ~Q(time_slot__lte=end_time), customer=self).all()
+        old_time_slots.delete()
         while current_time.time() < end_time.time():
-            TimeSlot.objects.create(
+            TimeSlot.objects.get_or_create(
                 time_slot=current_time.time(),
                 customer=self,
             )
@@ -88,6 +89,7 @@ class ItemSlot(models.Model):
     class Meta:
         verbose_name = "ItemSlot"
         verbose_name_plural = "ItemSlots"
+        ordering = ['name']
 
 class TimeSlot(models.Model):
     customer = models.ForeignKey(Customers, on_delete=models.CASCADE, related_name="time_slots")
@@ -100,6 +102,7 @@ class TimeSlot(models.Model):
     class Meta:
         verbose_name = "TimeSlot"
         verbose_name_plural = "TimeSlots"
+        ordering = ['time_slot']
 
 class Tournament(models.Model):
     customer = models.ForeignKey(Customers, on_delete=models.CASCADE, verbose_name="Организатор")
