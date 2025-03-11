@@ -21,7 +21,7 @@ from django.db import connection
 
 def tournament_list(request):
     yesterday = datetime.datetime.now() - datetime.timedelta(days=10)
-    customer = Customers.objects.filter().first()
+    
     tournaments = Tournament.objects.filter(is_finished=False, is_canceled=False, date__gt=yesterday).prefetch_related(
             "guestparticipant_set",
             Prefetch(
@@ -36,7 +36,7 @@ def tournament_list(request):
         guests = tournament.guestparticipant_set.all()
         tournament.participants_list = list(p.user for p in participants) + list(g.full_name for g in guests)
 
-    context = {"tournaments": tournaments, "customer": customer}
+    context = {"tournaments": tournaments}
     return render(request, 'tournament_list.html', context)
 
 def tournament_detail(request, tournament_id):

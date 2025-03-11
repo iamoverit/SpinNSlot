@@ -42,6 +42,7 @@ class TournamentAdmin(admin.ModelAdmin):
     form = TournamentForm
     change_form_template = 'admin/web/tournament/change_form.html'
     list_display = ('name', 'date', 'customer', 'participants_count', 'min_participants')
+    list_filter = ('is_training', 'is_finished', 'is_canceled', 'name')
     filter_horizontal = ('tables',)
     fieldsets = (
         (None, {
@@ -58,11 +59,11 @@ class TournamentAdmin(admin.ModelAdmin):
 
     def get_changeform_initial_data(self, request):
         return {
-            "date": datetime.date.today() + datetime.timedelta(days=1),
+            'date': datetime.date.today() + datetime.timedelta(days=1),
         }
 
     def participants_count(self, obj):
-        return f"{obj.participants.count()}/{obj.max_participants}"
+        return f'{obj.participants.count()}+{obj.guestparticipant_set.count()}/{obj.max_participants}'
 
 # НЕТ повторной регистрации через admin.site.register()
 @admin.register(TournamentRegistration)
@@ -81,8 +82,8 @@ class CustomUserChangeForm(UserChangeForm):
         # Убираем обязательность поля пароля
         self.fields['password'].required = False
         self.fields['password'].help_text = (
-            "Пароль хранится в зашифрованном виде. "
-            "Вы можете изменить пароль <a href=\"../password/\">здесь</a>."
+            'Пароль хранится в зашифрованном виде. '
+            'Вы можете изменить пароль <a href=\'../password/\'>здесь</a>.'
         )
 
 @admin.register(CustomUser)
