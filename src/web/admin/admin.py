@@ -4,7 +4,7 @@ from django.contrib.auth.forms import UserChangeForm
 from django.urls import path
 
 from web.admin.forms import TournamentForm
-from web.models import CustomUser, ItemSlot, UserSlot, Customers, TimeSlot, Tournament, TournamentRegistration
+from web.models import CustomUser, GuestParticipant, ItemSlot, UserSlot, Customers, TimeSlot, Tournament, TournamentRegistration
 import datetime
 # Register your models here.
 
@@ -41,7 +41,7 @@ class TournamentAdmin(admin.ModelAdmin):
         js = ('js/custom_datetime.js',)
     form = TournamentForm
     change_form_template = 'admin/web/tournament/change_form.html'
-    list_display = ('name', 'date', 'customer', 'participants_count', 'min_participants_')
+    list_display = ('name', 'date', 'customer', 'start_time_', 'end_time_', 'participants_count', 'min_participants_')
     list_filter = ('is_training', 'is_finished', 'is_canceled', 'name')
     filter_horizontal = ('tables',)
     fieldsets = (
@@ -62,6 +62,14 @@ class TournamentAdmin(admin.ModelAdmin):
             'date': datetime.date.today() + datetime.timedelta(days=1),
         }
     
+    @admin.display(description='Зав.',)
+    def end_time_(self, obj):
+        return obj.end_time
+
+    @admin.display(description='Нач.',)
+    def start_time_(self, obj):
+        return obj.start_time
+
     @admin.display(description='Min',)
     def min_participants_(self, obj):
         return obj.min_participants
@@ -74,6 +82,11 @@ class TournamentAdmin(admin.ModelAdmin):
 @admin.register(TournamentRegistration)
 class TournamentRegistrationAdmin(admin.ModelAdmin):
     list_display = ('user', 'tournament', 'registration_date')
+    list_filter = ('tournament',)
+
+@admin.register(GuestParticipant)
+class GuestParticipantAdmin(admin.ModelAdmin):
+    list_display = ('full_name', 'tournament', 'registered_by', 'phone')
     list_filter = ('tournament',)
 
 # # Кастомная форма для редактирования пользователя
