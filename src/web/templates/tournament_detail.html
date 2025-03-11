@@ -58,11 +58,11 @@
                                 Основные участники ({{ main_participants|length }})
                             </div>
                             <ul class="list-group list-group-flush">
-                                {% for user in main_participants %}
+                                {% for user_registration in main_participants %}
                                 <li class="list-group-item d-flex justify-content-between align-items-center">
                                     <div>
-                                        {{ user.get_full_name|default:user.username }}
-                                        {% if user == request.user %}
+                                        {{ user_registration.user.get_full_name|default:user_registration.user.username }}
+                                        {% if user_registration.user == request.user %}
                                         <span class="badge bg-primary ms-2">Вы</span>
                                         {% endif %}
                                     </div>

@@ -51,7 +51,7 @@
                             <div
                             class="btn btn-outline-success border-0 position-absolute top-0 end-0 d-flex align-items-center justify-content-center flex-shrink-0 pe-1 pt-0"
                             style="min-width: 0; filter: hue-rotate(90deg) saturate(000%); ;font-size: clamp(11px, 2vw, 16px);"
-                            id="participants_list-{{ userSlot.reserved_by.id }}" data-bs-toggle="dropdown">&#128100; {{ userSlot.reserved_by.total_participants }}</div>
+                            id="participants_list-{{ userSlot.reserved_by.id }}" data-bs-toggle="dropdown">&#128100; {{ userSlot.reserved_by.participants_list|length }}</div>
                             <ul class="dropdown-menu" aria-labelledby="participants_list-{{ userSlot.reserved_by.id }}">
                                 <li><h6 class="dropdown-header">Participants list</h6></li>
                                 {% for name in userSlot.reserved_by.participants_list %}

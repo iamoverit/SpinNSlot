@@ -7,7 +7,7 @@ from django.contrib.auth import login, logout
 from django.urls import reverse
 from django.conf import settings
 from django.shortcuts import render
-from django.db.models import Q
+from django.db.models import Q, Prefetch
 from django.utils import timezone
 from django.contrib import messages
 
@@ -21,15 +21,33 @@ from django.db import connection
 
 def tournament_list(request):
     yesterday = datetime.datetime.now() - datetime.timedelta(days=10)
-    tournaments = Tournament.objects.filter(is_finished=False, is_canceled=False, date__gt=yesterday).all()
+    customer = Customers.objects.filter().first()
+    tournaments = Tournament.objects.filter(is_finished=False, is_canceled=False, date__gt=yesterday).prefetch_related(
+            "guestparticipant_set",
+            Prefetch(
+                'tournamentregistration_set',  # Загружаем рецензии
+                queryset=TournamentRegistration.objects.prefetch_related('user'),  # Загружаем пользователей для рецензий
+                to_attr='tournamentregistration_users'  # Сохраняем рецензии в отдельный атрибут
+            ),
+        ).all()
+
     for tournament in tournaments:
-        participants = tournament.tournamentregistration_set.all().values_list('user__username', flat=True)
-        guests = tournament.guestparticipant_set.all().values_list('full_name', flat=True)
-        tournament.participants_list = list(participants) + list(guests)
-    return render(request, 'tournament_list.html', {'tournaments': tournaments})
+        participants = tournament.tournamentregistration_users
+        guests = tournament.guestparticipant_set.all()
+        tournament.participants_list = list(p.user for p in participants) + list(g.full_name for g in guests)
+
+    context = {"tournaments": tournaments, "customer": customer}
+    return render(request, 'tournament_list.html', context)
 
 def tournament_detail(request, tournament_id):
-    tournament = get_object_or_404(Tournament, pk=tournament_id)
+    tournament = get_object_or_404(Tournament.objects.prefetch_related(
+            "guestparticipant_set",
+            Prefetch(
+                'tournamentregistration_set',  # Загружаем рецензии
+                queryset=TournamentRegistration.objects.prefetch_related('user'),  # Загружаем пользователей для рецензий
+                to_attr='tournamentregistration_users'  # Сохраняем рецензии в отдельный атрибут
+            ),
+        ), pk=tournament_id)
     
     registration = TournamentRegistration.objects.filter(
         user=request.user,
@@ -37,15 +55,15 @@ def tournament_detail(request, tournament_id):
     ).first() if request.user.is_authenticated else None
 
     # Основные участники с информацией о регистрации
-    main_participants = tournament.participants.select_related('guest_profile').all()
+    main_participants = tournament.tournamentregistration_users
     
     # Все гостевые участники
-    guest_participants_all = tournament.guestparticipant_set.select_related('registered_by').all()
+    guest_participants_all = tournament.guestparticipant_set.all()
     
     # Словарь с датами регистрации для отображения
     registration_dates = {
         reg.user_id: reg.registration_date 
-        for reg in tournament.tournamentregistration_set.all()
+        for reg in tournament.tournamentregistration_users
     }
 
     return render(request, 'tournament_detail.html', {
@@ -58,7 +76,7 @@ def tournament_detail(request, tournament_id):
         'guest_participants_all': guest_participants_all,
         'registration_dates': registration_dates,
         'max_guests': 3,
-        'total_participants': tournament.total_participants
+        'total_participants': len(main_participants)+len(guest_participants_all)
     })
 
 @login_required
@@ -99,13 +117,21 @@ def daily_schedule(request, selected_date_str=None):
 
     userSlots = UserSlot.objects.filter(reservation_date=selected_date) \
         .prefetch_related('user', 'table', 'time').all()
-    tournaments = Tournament.objects.filter(date=selected_date, is_canceled=False) \
-        .prefetch_related('time_slots', 'tables').all()
+    tournaments = Tournament.objects.filter(date=selected_date, is_canceled=False).prefetch_related(
+            "time_slots",
+            "tables",
+            "guestparticipant_set",
+            Prefetch(
+                'tournamentregistration_set',  # Загружаем рецензии
+                queryset=TournamentRegistration.objects.prefetch_related('user'),  # Загружаем пользователей для рецензий
+                to_attr='tournamentregistration_users'  # Сохраняем рецензии в отдельный атрибут
+            ),
+        ).all()
     
     for tournament in tournaments:
-        participants = tournament.tournamentregistration_set.all().values_list('user__username', flat=True)
-        guests = tournament.guestparticipant_set.all().values_list('full_name', flat=True)
-        tournament.participants_list = list(participants) + list(guests)
+        participants = tournament.tournamentregistration_users
+        guests = tournament.guestparticipant_set.all()
+        tournament.participants_list = list(p.user for p in participants) + list(g.full_name for g in guests)
 
     schedule = {}
     for timeSlot in timeSlots:
@@ -159,12 +185,21 @@ def weekly_schedule(request, selected_date_str=None):
         selected_date = datetime.date.today()
     monday, sunday = get_week_range(selected_date)
 
-    tournaments = Tournament.objects.filter(date__range=(monday, sunday), is_canceled=False) \
-        .prefetch_related('time_slots', 'tables').all()
+    tournaments = Tournament.objects.filter(date__range=(monday, sunday), is_canceled=False).prefetch_related(
+            "time_slots",
+            "tables",
+            "guestparticipant_set",
+            Prefetch(
+                'tournamentregistration_set',  # Загружаем рецензии
+                queryset=TournamentRegistration.objects.prefetch_related('user'),  # Загружаем пользователей для рецензий
+                to_attr='tournamentregistration_users'  # Сохраняем рецензии в отдельный атрибут
+            ),
+        ).all()
+    
     for tournament in tournaments:
-        participants = tournament.tournamentregistration_set.all().values_list('user__username', flat=True)
-        guests = tournament.guestparticipant_set.all().values_list('full_name', flat=True)
-        tournament.participants_list = list(participants) + list(guests)
+        participants = tournament.tournamentregistration_users
+        guests = tournament.guestparticipant_set.all()
+        tournament.participants_list = list(p.user for p in participants) + list(g.full_name for g in guests)
     schedule = {}
 
     days = []
@@ -191,7 +226,7 @@ def weekly_schedule(request, selected_date_str=None):
                     "rowspan": 1,
                 }
         # print([monday + timedelta(days=i) for i in range((sunday - monday).days + 1)])
-              
+
     context = {
         'week_range': (monday, sunday),
         'timeSlots': timeSlots,
@@ -199,6 +234,7 @@ def weekly_schedule(request, selected_date_str=None):
         'schedule': prepare_schedule(schedule, timeSlots, days),
         'selected_date': selected_date,
         'today': datetime.date.today(),
+        'tournaments': tournaments,
     }
     return render(request, 'weekly_schedule.html', context)
 
@@ -294,4 +330,3 @@ def get_timeslot_choices(request):
     else:
         time_slots = []
     return JsonResponse({'time_slots': time_slots})
-

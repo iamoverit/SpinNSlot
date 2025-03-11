@@ -22,8 +22,8 @@
                         id="participants_list-{{ tournament.id }}" data-bs-toggle="dropdown">
                             <div class="progress-bar" 
                                 role="progressbar" 
-                                style="width: {{ tournament.total_participants|percentage:tournament.max_participants }}">
-                                {{ tournament.total_participants }}/{{ tournament.max_participants }}
+                                style="width: {{ tournament.participants_list|length|percentage:tournament.max_participants }}">
+                                {{ tournament.participants_list|length }}/{{ tournament.max_participants }}
                             </div>
                             <ul class="dropdown-menu" aria-labelledby="participants_list-{{ tournament.id }}">
                                 <li><h6 class="dropdown-header">Participants list</h6></li>
@@ -47,6 +47,11 @@
                         <!-- Полное описание (скрыто в сложенном состоянии) -->
                         <div id="description-{{ tournament.id }}" class="collapse partial-collapse">
                             {{ tournament.description|markdownify:"preview" }}
+                            {% if tournament.is_training %}
+                                {{ customer.base_description_training|markdownify:"preview" }}
+                            {% else %}
+                                {{ customer.base_description_tournament|markdownify:"preview" }}
+                            {% endif %}
                         </div>
                         <button class="btn btn-link toggle-partial-collapse">
                         </button>

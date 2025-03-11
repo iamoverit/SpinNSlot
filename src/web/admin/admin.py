@@ -54,6 +54,7 @@ class TournamentAdmin(admin.ModelAdmin):
             'fields': ('description', 'is_canceled', 'is_finished', 'is_training')
         }),
     )
+    save_as = True
 
     def get_changeform_initial_data(self, request):
         return {

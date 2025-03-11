@@ -43,6 +43,8 @@ class Customers(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     working_hours_start = models.TimeField(default='10:00')
     working_hours_end = models.TimeField(default='22:00')
+    base_description_tournament = models.TextField(verbose_name="Базовое описание турнира", default="")
+    base_description_training = models.TextField(verbose_name="Базовое описание тренировки", default="")
 
     def __str__(self):
         return self.name
@@ -167,10 +169,10 @@ class Tournament(models.Model):
         ).all()
         self.time_slots.add(*[slot.id for slot in slots])
 
-    @property
-    def total_participants(self):
-        """Общее количество участников (основные + гостевые)"""
-        return self.participants.count() + self.guestparticipant_set.count()
+    # @property
+    # def total_participants(self):
+    #     """Общее количество участников (основные + гостевые)"""
+    #     return self.participants.count() + self.guestparticipant_set.count()
 
     def check_participants(self):
         total = self.participants.count() + self.guestparticipant_set.count()

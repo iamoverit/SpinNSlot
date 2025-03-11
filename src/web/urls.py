@@ -1,5 +1,6 @@
-from django.urls import path
+from django.urls import path, include
 from django.contrib.auth import views as auth_views
+from django.conf import settings
 from . import views
 
 urlpatterns = [
@@ -19,3 +20,9 @@ urlpatterns = [
     path('tournaments/<int:tournament_id>/add-guest/', views.add_guest_participant, name='add_guest'),
     path('logout/', auth_views.LogoutView.as_view(), name='logout'),
 ]
+
+if settings.DEBUG:
+    import debug_toolbar
+    urlpatterns += [
+        path('__debug__/', include(debug_toolbar.urls)),
+    ]
