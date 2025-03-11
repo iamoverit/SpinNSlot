@@ -1,3 +1,4 @@
+import datetime
 from django import template
 
 from web.models import UserSlot, Tournament
@@ -42,3 +43,11 @@ def is_tournament(value):
 @register.filter
 def format_string(value, arg):
     return value.format(arg)
+
+@register.filter
+def weekday(value):
+    return value.strftime('%a')
+
+@register.filter
+def is_today(value):
+    return value == datetime.datetime.today().date()

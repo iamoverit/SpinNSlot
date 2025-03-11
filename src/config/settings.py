@@ -26,6 +26,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.locale.LocaleMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -77,6 +78,24 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'ru-ru'
+
+LANGUAGES = [
+    ('ru', 'Russian'),
+    ('en', 'English'),
+]
+
+import locale
+try:
+    locale.setlocale(locale.LC_TIME, 'ru_RU.UTF-8')
+except locale.Error:
+    try:
+        locale.setlocale(locale.LC_TIME, 'ru_RU')
+    except locale.Error:
+        try:
+            locale.setlocale(locale.LC_TIME, 'Russian_Russia.1251')  # Для Windows
+        except locale.Error:
+            pass
 
 TIME_ZONE = 'UTC'
 

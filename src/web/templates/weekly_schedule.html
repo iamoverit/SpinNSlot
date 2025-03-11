@@ -19,8 +19,8 @@
         <div class="d-grid" style="grid-template-columns: minmax(10px, auto) {% for day in days %} 1fr{% endfor %}; grid-template-rows: repeat({{ timeSlots|length }}, 1fr); gap: -1px;">
             <div class=""></div>
             {% for day in days %}
-                <div class="disabled border-bottom w-100 h-100 d-flex align-items-center justify-content-center flex-shrink-0"
-                            style="min-width: 0; font-size: clamp(11px, 2vw, 16px);">{{ day.day|date:"d-m-y" }}</div>
+                <div class="btn disabled rounded-0 border-0 border-start border-end {% if day.day|is_today %}bg-info {% endif %} w-100 h-100 d-flex align-items-center justify-content-center flex-shrink-0"
+                            style="min-width: 0; font-size: clamp(11px, 2vw, 16px);">{{ day.day|weekday }}, {{ day.day|date:"d b" }}</div>
             {% endfor %}
             {% for timeSlot in timeSlots %}
                 <div class="border-end w-100 h-100 d-flex align-items-center justify-content-center flex-shrink-0"
