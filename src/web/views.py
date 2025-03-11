@@ -19,7 +19,7 @@ from .models import TimeSlot, ItemSlot, UserSlot, CustomUser
 from django.db import connection
 
 def tournament_list(request):
-    yesterday = datetime.datetime.now() - datetime.timedelta(days=10)
+    yesterday = datetime.datetime.now() - datetime.timedelta(days=1)
     
     tournaments = Tournament.objects.filter(is_finished=False, is_canceled=False, date__gt=yesterday).prefetch_registred_users().all()
 
