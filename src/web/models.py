@@ -1,5 +1,5 @@
 from django.db import models
-from django.db.models import Q
+from django.db.models import Q, Prefetch
 from django.contrib.auth.models import User
 from django.contrib.auth.models import AbstractUser
 from datetime import timedelta, datetime
@@ -104,6 +104,24 @@ class TimeSlot(models.Model):
         verbose_name_plural = "TimeSlots"
         ordering = ['time_slot']
 
+class TournamentQuerySet(models.QuerySet):
+    def prefetch_registred_users(self):
+        return self.prefetch_related(
+            "guestparticipant_set",
+            Prefetch(
+                'tournamentregistration_set',  # Загружаем рецензии
+                queryset=TournamentRegistration.objects.prefetch_related('user'),  # Загружаем пользователей для рецензий
+                to_attr='tournamentregistration_users'  # Сохраняем рецензии в отдельный атрибут
+            ),
+        )
+
+class TournamentManager(models.Manager):
+    def get_queryset(self):
+        return TournamentQuerySet(self.model, using=self._db)
+    
+    def prefetch_registred_users(self):
+        return self.get_queryset().prefetch_registred_users()
+
 class Tournament(models.Model):
     customer = models.ForeignKey(Customers, on_delete=models.CASCADE, verbose_name="Организатор")
     name = models.CharField(max_length=200, verbose_name="Название турнира")
@@ -136,6 +154,8 @@ class Tournament(models.Model):
     class Meta:
         verbose_name = "Турнир"
         verbose_name_plural = "Турниры"
+
+    objects = TournamentManager()
 
     def __str__(self):
         return f"{self.name} ({self.date} {self.start_time}-{self.end_time})"

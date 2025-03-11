@@ -7,7 +7,6 @@ from django.contrib.auth import login, logout
 from django.urls import reverse
 from django.conf import settings
 from django.shortcuts import render
-from django.db.models import Q, Prefetch
 from django.utils import timezone
 from django.contrib import messages
 
@@ -22,14 +21,7 @@ from django.db import connection
 def tournament_list(request):
     yesterday = datetime.datetime.now() - datetime.timedelta(days=10)
     
-    tournaments = Tournament.objects.filter(is_finished=False, is_canceled=False, date__gt=yesterday).prefetch_related(
-            "guestparticipant_set",
-            Prefetch(
-                'tournamentregistration_set',  # Загружаем рецензии
-                queryset=TournamentRegistration.objects.prefetch_related('user'),  # Загружаем пользователей для рецензий
-                to_attr='tournamentregistration_users'  # Сохраняем рецензии в отдельный атрибут
-            ),
-        ).all()
+    tournaments = Tournament.objects.filter(is_finished=False, is_canceled=False, date__gt=yesterday).prefetch_registred_users().all()
 
     for tournament in tournaments:
         participants = tournament.tournamentregistration_users
@@ -40,14 +32,7 @@ def tournament_list(request):
     return render(request, 'tournament_list.html', context)
 
 def tournament_detail(request, tournament_id):
-    tournament = get_object_or_404(Tournament.objects.prefetch_related(
-            "guestparticipant_set",
-            Prefetch(
-                'tournamentregistration_set',  # Загружаем рецензии
-                queryset=TournamentRegistration.objects.prefetch_related('user'),  # Загружаем пользователей для рецензий
-                to_attr='tournamentregistration_users'  # Сохраняем рецензии в отдельный атрибут
-            ),
-        ), pk=tournament_id)
+    tournament = get_object_or_404(Tournament.objects.prefetch_registred_users(), pk=tournament_id)
     
     registration = TournamentRegistration.objects.filter(
         user=request.user,
@@ -117,16 +102,8 @@ def daily_schedule(request, selected_date_str=None):
 
     userSlots = UserSlot.objects.filter(reservation_date=selected_date) \
         .prefetch_related('user', 'table', 'time').all()
-    tournaments = Tournament.objects.filter(date=selected_date, is_canceled=False).prefetch_related(
-            "time_slots",
-            "tables",
-            "guestparticipant_set",
-            Prefetch(
-                'tournamentregistration_set',  # Загружаем рецензии
-                queryset=TournamentRegistration.objects.prefetch_related('user'),  # Загружаем пользователей для рецензий
-                to_attr='tournamentregistration_users'  # Сохраняем рецензии в отдельный атрибут
-            ),
-        ).all()
+    tournaments = Tournament.objects.filter(date=selected_date, is_canceled=False).prefetch_registred_users() \
+        .prefetch_related("time_slots", "tables").all()
     
     for tournament in tournaments:
         participants = tournament.tournamentregistration_users
@@ -185,16 +162,8 @@ def weekly_schedule(request, selected_date_str=None):
         selected_date = datetime.date.today()
     monday, sunday = get_week_range(selected_date)
 
-    tournaments = Tournament.objects.filter(date__range=(monday, sunday), is_canceled=False).prefetch_related(
-            "time_slots",
-            "tables",
-            "guestparticipant_set",
-            Prefetch(
-                'tournamentregistration_set',  # Загружаем рецензии
-                queryset=TournamentRegistration.objects.prefetch_related('user'),  # Загружаем пользователей для рецензий
-                to_attr='tournamentregistration_users'  # Сохраняем рецензии в отдельный атрибут
-            ),
-        ).all()
+    tournaments = Tournament.objects.filter(date__range=(monday, sunday), is_canceled=False).prefetch_registred_users() \
+        .prefetch_related("time_slots", "tables").all()
     
     for tournament in tournaments:
         participants = tournament.tournamentregistration_users

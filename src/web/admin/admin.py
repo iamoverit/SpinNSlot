@@ -41,7 +41,7 @@ class TournamentAdmin(admin.ModelAdmin):
         js = ('js/custom_datetime.js',)
     form = TournamentForm
     change_form_template = 'admin/web/tournament/change_form.html'
-    list_display = ('name', 'date', 'customer', 'participants_count', 'min_participants')
+    list_display = ('name', 'date', 'customer', 'participants_count', 'min_participants_')
     list_filter = ('is_training', 'is_finished', 'is_canceled', 'name')
     filter_horizontal = ('tables',)
     fieldsets = (
@@ -61,9 +61,14 @@ class TournamentAdmin(admin.ModelAdmin):
         return {
             'date': datetime.date.today() + datetime.timedelta(days=1),
         }
-
+    
+    @admin.display(description='Min',)
+    def min_participants_(self, obj):
+        return obj.min_participants
+    
+    @admin.display(description='Registred',)
     def participants_count(self, obj):
-        return f'{obj.participants.count()}+{obj.guestparticipant_set.count()}/{obj.max_participants}'
+        return f'{obj.tournamentregistration_set.count()}+{obj.guestparticipant_set.count()}/{obj.max_participants}'
 
 # НЕТ повторной регистрации через admin.site.register()
 @admin.register(TournamentRegistration)
