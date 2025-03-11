@@ -51,6 +51,7 @@
                                 {{ customer.base_description_training|markdownify:"preview" }}
                             {% else %}
                                 {{ customer.base_description_tournament|markdownify:"preview" }}
+                                {{'> ❗ Если зарегистрировано **менее {} участников**, турнир **ОТМЕНЯЕТСЯ**!'|format_string:tournament.min_participants|markdownify:"preview" }}
                             {% endif %}
                         </div>
                         <button class="btn btn-link toggle-partial-collapse">

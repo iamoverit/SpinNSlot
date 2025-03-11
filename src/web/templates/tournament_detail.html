@@ -43,6 +43,12 @@
                     <div class="mb-4">
                         <h4>Описание турнира</h4>
                         <div>{{ tournament.description|markdownify }}</div>
+                        {% if tournament.is_training %}
+                            {{ customer.base_description_training|markdownify }}
+                        {% else %}
+                            {{ customer.base_description_tournament|markdownify }}
+                            {{'> ❗ Если зарегистрировано **менее {} участников**, турнир **ОТМЕНЯЕТСЯ**!'|format_string:tournament.min_participants|markdownify}}
+                        {% endif %}
                     </div>
                 </div>
 

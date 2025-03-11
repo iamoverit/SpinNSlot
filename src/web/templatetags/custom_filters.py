@@ -38,3 +38,7 @@ def is_userslot(value):
 @register.filter
 def is_tournament(value):
     return isinstance(value, Tournament)
+
+@register.filter
+def format_string(value, arg):
+    return value.format(arg)
