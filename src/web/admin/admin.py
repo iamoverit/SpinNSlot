@@ -62,11 +62,11 @@ class TournamentAdmin(admin.ModelAdmin):
             'date': datetime.date.today() + datetime.timedelta(days=1),
         }
     
-    @admin.display(description='Зав.',)
+    @admin.display(description='🏁',)
     def end_time_(self, obj):
         return obj.end_time
 
-    @admin.display(description='Нач.',)
+    @admin.display(description='🕒',)
     def start_time_(self, obj):
         return obj.start_time
 

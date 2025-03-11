@@ -46,12 +46,19 @@
                     {% elif userSlot.type == 'tournament' %}
                         <div class="w-100 h-100 d-flex align-items-center justify-content-center flex-shrink-0 position-relative" style="grid-row: span {{ userSlot.rowspan }}; grid-column: span {{ userSlot.colspan }};">
                             <a href="{% url 'tournament_detail' userSlot.reserved_by.id %}" 
-                            class="btn p-0 rounded-0 bg-gradient btn-{% if userSlot.reserved_by.is_training %}info{% else %}warning{% endif %} w-100 h-100 d-flex align-items-center justify-content-center flex-shrink-0"
+                            class="btn d-block p-0 rounded-0 bg-gradient btn-{% if userSlot.reserved_by.is_training %}info{% else %}warning{% endif %} w-100 h-100 d-flex align-items-center justify-content-center flex-shrink-0"
                             style="min-width: 0; font-size: clamp(11px, 2vw, 16px);"
-                            data-time="{{ userSlot.id }}">{{userSlot.reserved_by.name}}</a>
+                            data-time="{{ userSlot.id }}">
+                            <ul class="list-group list-group-flush d-flex align-items-center justify-content-center pt-0"
+                            style="min-width: 0; font-size: clamp(8px, 2vw, 16px);">
+                                <li class="list-group-item bg-transparent p-0">{{userSlot.reserved_by.name}}</li>
+                                <li class="list-group-item bg-transparent p-0">🕒{{userSlot.reserved_by.start_time}}</li>
+                                <li class="list-group-item bg-transparent p-0">🏁{{userSlot.reserved_by.end_time}}</li>
+                            </ul>
+                            </a>
                             <div
                             class="btn btn-outline-success border-0 position-absolute top-0 end-0 d-flex align-items-center justify-content-center flex-shrink-0 pe-1 pt-0"
-                            style="min-width: 0; filter: hue-rotate(90deg) saturate(000%); ;font-size: clamp(11px, 2vw, 16px);"
+                            style="min-width: 0; filter: hue-rotate(90deg) saturate(000%); font-size: clamp(11px, 2vw, 16px);"
                             id="participants_list-{{ userSlot.reserved_by.id }}" data-bs-toggle="dropdown">&#128100; {{ userSlot.reserved_by.participants_list|length }}</div>
                             <ul class="dropdown-menu" aria-labelledby="participants_list-{{ userSlot.reserved_by.id }}">
                                 <li><h6 class="dropdown-header">Participants list</h6></li>
