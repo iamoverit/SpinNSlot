@@ -27,30 +27,35 @@
                     {% with schedule|get:timeSlot.id|get:itemSlot.id as userSlot %}
                     {% if userSlot and userSlot.merged %}
                     {% if userSlot.type == 'user' %}
-                        <div class="position-relative flex-shrink-0"
-                        style="min-width: 0;">
-                            <button class="btn bg-gradient {% if userSlot.reserved_by.user.id == user.id %}btn-info{% else %}btn-warning{% endif %} w-100 h-100 d-flex align-items-center justify-content-center flex-shrink-0"
-                            style="min-width: 0; font-size: clamp(12px, 2vw, 16px);" aria-disabled="true">
-                            {% if userSlot.user.id == user.id or user.is_staff or user.is_superuser %}
-                            <a href="{% url 'unbook_slot' userSlot.reserved_by.id %}" 
-                            class="btn btn-outline-danger rounded-circle cancel-btn position-absolute">❌</a>
-                            {% endif %}
-                            {% if userSlot.reserved_by.user.id == user.id %}
-                                You <span class="reserved-icon">✔</span>
-                            {% else %}
-                                {{ userSlot.reserved_by.user }}
-                            {% endif %}
+                        <div class="position-relative flex-shrink-0">
+                            <button class="btn disabled {% if userSlot.reserved_by.user.id == user.id %}btn-danger{% else %}btn-secondary{% endif %} w-100 h-100 d-flex align-items-center justify-content-center flex-shrink-0"
+                            style="min-width: 0; font-size: clamp(12px, 2vw, 16px);">
+                                {% if userSlot.reserved_by.user.id == user.id %}
+                                    You <span class="text-success">✔</span>
+                                {% else %}
+                                    {{ userSlot.reserved_by.user }}
+                                {% endif %}
                             </button>
+                            {% if userSlot.user.id == user.id or user.is_staff or user.is_superuser %}
+                                <a href="{% url 'unbook_slot' userSlot.reserved_by.id %}" class="btn btn-outline-danger rounded-circle cancel-btn position-absolute">❌</a>
+                            {% endif %}
                         </div>
                     {% elif userSlot.type == 'tournament' %}
                         <div class="w-100 h-100 d-flex align-items-center justify-content-center flex-shrink-0 position-relative" style="grid-row: span {{ userSlot.rowspan }}; grid-column: span {{ userSlot.colspan }};">
                             <a href="{% url 'tournament_detail' userSlot.reserved_by.id %}" 
-                            class="btn btn-primary bg-gradient w-100 h-100 d-flex align-items-center justify-content-center flex-shrink-0"
+                            class="btn bg-gradient btn-{% if userSlot.reserved_by.is_training %}info{% else %}warning{% endif %} w-100 h-100 d-flex align-items-center justify-content-center flex-shrink-0"
                             style="min-width: 0; font-size: clamp(11px, 2vw, 16px);"
-                            data-time="{{ userSlot.id }}">{{userSlot.reserved_by.name}}</a>
+                            data-time="{{ userSlot.id }}">
+                                <ul class="list-group list-group-flush d-flex align-items-center pt-0"
+                                style="min-width: 0; font-size: clamp(8px, 2vw, 16px);">
+                                    <li class="list-group-item bg-transparent">{{userSlot.reserved_by.name}}</li>
+                                    <li class="list-group-item bg-transparent">🕒{{userSlot.reserved_by.start_time}}</li>
+                                    <li class="list-group-item bg-transparent">🏁{{userSlot.reserved_by.end_time}}</li>
+                                </ul>                        
+                            </a>
                             <div
                             class="btn btn-outline-success border-0 position-absolute top-0 end-0 d-flex align-items-center justify-content-center flex-shrink-0 pe-1 pt-0"
-                            style="min-width: 0; filter: hue-rotate(90deg) saturate(000%); ;font-size: clamp(11px, 2vw, 16px);"
+                            style="min-width: 0; filter: hue-rotate(90deg) saturate(000%); font-size: clamp(11px, 2vw, 16px);"
                             id="participants_list-{{ userSlot.reserved_by.id }}" data-bs-toggle="dropdown">&#128100; {{ userSlot.reserved_by.participants_list|length }}</div>
                             <ul class="dropdown-menu" aria-labelledby="participants_list-{{ userSlot.reserved_by.id }}">
                                 <li><h6 class="dropdown-header">Participants list</h6></li>
