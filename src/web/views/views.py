@@ -225,9 +225,11 @@ def register_tournament(request, tournament_id):
     TournamentRegistration.objects.create(user=request.user, tournament=tournament)
     return redirect('tournament_detail', tournament_id=tournament.id)
 
-@ratelimit(key='user', rate='10/h')
+@ratelimit(key='user', rate='10/h', block=False)
 @login_required(login_url='telegram_login')
 def book_slot(request, time_slot_id, item_slot_id, reservation_date_str):
+    if getattr(request, "limited", False) and not request.user.is_staff:
+        return ratelimit_view(request, Ratelimited)
     time_slot = get_object_or_404(TimeSlot, id=time_slot_id)
     item_slot = get_object_or_404(ItemSlot, id=item_slot_id)
     

@@ -16,7 +16,7 @@
     </div>
 
     <div class="container-fluid p-0">
-        <div class="d-grid" style="grid-template-columns: minmax(20px, auto) {% for item in itemSlots %} 1fr{% endfor %}; grid-template-rows: repeat({{ timeSlots|length }}, 1fr); gap: 0px;">
+        <div class="d-grid" style="grid-template-columns: minmax(20px, auto) {% for item in itemSlots %} 1fr{% endfor %}; grid-template-rows: repeat({{ timeSlots|length }}, auto); gap: 0px;">
             <div class=""></div>
             {% for itemSlot in itemSlots %}
                 <div class="disabled border-bottom w-100 h-100 d-flex align-items-center justify-content-center">{{ itemSlot.name|slugify }}</div>
