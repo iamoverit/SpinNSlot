@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load custom_filters %}
+{% load markdownify %}
+
+{% block content %}
+
+
+{% if not request.user.is_authenticated %}
+<div class="alert alert-warning">
+    <a href="https://oauth.telegram.org/auth?bot_id={{ telegram_bot_id }}&origin={{ request.build_absolute_uri }}&return_to={% url 'telegram_auth' %}&embed=1"
+    class="telegram-login-btn">
+     Войти через Telegram
+ </a>
+</div>
+{% else %}
+<ul class="list-group">
+    <li class="list-group-item">ID: {{ user.id }}</li>
+    <li class="list-group-item">Picture: <img src="{{ user.avatar_url }}" alt="No image"></li>
+    <li class="list-group-item">Username: @{{ user.username }}</li>
+    <li class="list-group-item">Showname: {{ user }}</li>
+    <li class="list-group-item">First name: {{ user.first_name }}</li>
+    <li class="list-group-item">Last name: {{ user.last_name }}</li>
+    <li class="list-group-item">Telegram id: {{ user.telegram_id }}</li>
+    <li class="list-group-item"><a href="{% url 'logout' %}">Выйти</li>
+</ul>
+{% endif%}
+{% endblock %}

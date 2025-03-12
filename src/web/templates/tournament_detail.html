@@ -118,7 +118,10 @@
                     <div class="sticky-top" style="top: 20px;">
                         {% if not request.user.is_authenticated %}
                         <div class="alert alert-warning">
-                            Для регистрации необходимо <a href="{% url 'telegram_login' %}">войти через Telegram</a>
+                            Для регистрации необходимо <a href="https://oauth.telegram.org/auth?bot_id={{ telegram_bot_id }}&origin={{ request.build_absolute_uri }}&return_to={% url 'telegram_auth' %}&embed=1"
+                            class="telegram-login-btn">
+                             Войти через Telegram
+                         </a>
                         </div>
                         {% else %}
                             {% if is_registered %}

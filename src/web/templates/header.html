@@ -50,9 +50,9 @@
                         </ul>
                     {% else %}
                         <script src="https://telegram.org/js/telegram-widget.js" async
-                            data-telegram-login="FlagmanTTbot" 
+                            data-telegram-login="{{ telegram_bot_name }}" 
                             data-size="large" 
-                            data-auth-url="/telegram-login/" 
+                            data-auth-url="{% url 'telegram_auth' %}" 
                             data-request-access="write">
                         </script>
                     {% endif %}

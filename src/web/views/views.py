@@ -2,8 +2,7 @@ import datetime
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
-from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
-from django.contrib.auth import login, logout
+from django.http import JsonResponse, HttpResponseRedirect
 from django.urls import reverse
 from django.conf import settings
 from django.shortcuts import render
@@ -11,11 +10,17 @@ from django.utils import timezone
 from django.contrib import messages
 
 from web.utils import DaySlot, get_week_range, prepare_schedule, week_date_iterator
-from .models import Customers, Tournament, TournamentRegistration, GuestParticipant
-from .permissions import staff_or_author_required
-from .validators import validate_telegram_data
-from .models import TimeSlot, ItemSlot, UserSlot, CustomUser
-
+from web.models import (
+    Customers,
+    Tournament,
+    TournamentRegistration,
+    GuestParticipant,
+    TimeSlot,
+    ItemSlot,
+    UserSlot,
+    CustomUser,
+)
+from web.permissions import staff_or_author_required
 from django.db import connection
 
 def tournament_list(request):
@@ -260,35 +265,6 @@ def unbook_slot(request, user_slot_id):
         return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
     except ValueError:
         return render(request, 'error.html', {'message': 'Invalid date format'})
-
-
-def logout_view(request):
-    logout(request)
-    return redirect('index')
-
-
-def telegram_login(request):
-    if request.method == "GET":
-        data = request.GET
-        if validate_telegram_data(settings.TELEGRAM_BOT_TOKEN, data):
-            telegram_id = data.get("id")
-
-            user, created = CustomUser.objects.get_or_create(telegram_id=telegram_id, 
-                                                    defaults={
-                                                        "username": data.get("username", telegram_id),
-                                                        "first_name": data.get("first_name", ""),
-                                                        "last_name": data.get("last_name", ""),
-                                                        "avatar_url": data.get("photo_url")
-                                                    })
-            if not created:
-                user.username = data.get("username", telegram_id)
-                user.first_name = data.get("first_name", "")
-                user.last_name = data.get("last_name", "")
-                user.save()
-            login(request, user)
-            return redirect('index')
-        else:
-            return render(request, 'error.html', {'message': 'Invalid Telegram authentication data.'})
 
 def get_timeslot_choices(request):
     customer_id = request.GET.get('customer_id')
