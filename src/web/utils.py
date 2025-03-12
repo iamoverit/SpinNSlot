@@ -1,5 +1,6 @@
 import datetime
 import dataclasses
+
 @dataclasses.dataclass
 class DaySlot:
     id: int

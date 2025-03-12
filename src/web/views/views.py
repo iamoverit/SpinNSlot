@@ -3,11 +3,11 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
 from django.http import JsonResponse, HttpResponseRedirect
-from django.urls import reverse
-from django.conf import settings
 from django.shortcuts import render
 from django.utils import timezone
 from django.contrib import messages
+from django_ratelimit.decorators import ratelimit
+from django_ratelimit.exceptions import Ratelimited
 
 from web.utils import DaySlot, get_week_range, prepare_schedule, week_date_iterator
 from web.models import (
@@ -69,7 +69,7 @@ def tournament_detail(request, tournament_id):
         'total_participants': len(main_participants)+len(guest_participants_all)
     })
 
-@login_required
+@login_required(login_url='telegram_login')
 def add_guest_participant(request, tournament_id):
     tournament = get_object_or_404(Tournament, pk=tournament_id)
     
@@ -212,7 +212,7 @@ def weekly_schedule(request, selected_date_str=None):
     }
     return render(request, 'weekly_schedule.html', context)
 
-@login_required
+@login_required(login_url='telegram_login')
 def register_tournament(request, tournament_id):
     tournament = get_object_or_404(Tournament, pk=tournament_id)
     
@@ -225,7 +225,8 @@ def register_tournament(request, tournament_id):
     TournamentRegistration.objects.create(user=request.user, tournament=tournament)
     return redirect('tournament_detail', tournament_id=tournament.id)
 
-@login_required
+@ratelimit(key='user', rate='10/h')
+@login_required(login_url='telegram_login')
 def book_slot(request, time_slot_id, item_slot_id, reservation_date_str):
     time_slot = get_object_or_404(TimeSlot, id=time_slot_id)
     item_slot = get_object_or_404(ItemSlot, id=item_slot_id)
@@ -252,7 +253,7 @@ def book_slot(request, time_slot_id, item_slot_id, reservation_date_str):
         return render(request, 'error.html', {'message': 'Invalid date format'})
 
 
-@login_required
+@login_required(login_url='telegram_login')
 @staff_or_author_required
 def unbook_slot(request, user_slot_id):
     try:
@@ -275,3 +276,6 @@ def get_timeslot_choices(request):
     else:
         time_slots = []
     return JsonResponse({'time_slots': time_slots})
+
+def ratelimit_view(request, e: Ratelimited):
+    return render(request, 'error.html', {'message': 'Вы превысили лимит. Попробуйте позже.'})

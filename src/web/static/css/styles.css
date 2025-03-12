@@ -165,13 +165,6 @@ body {
     margin-top: auto;
 }
 
-/* Main content styles */
-main {
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-}
-
 .book-btn {
     background-color: #4CAF50; /* Приятный зеленый */
     border-color: #45a049;

@@ -19,6 +19,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_bootstrap5',
+    'django_ratelimit',
     'markdownify.apps.MarkdownifyConfig',
     'web',
 ]
@@ -32,8 +33,9 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django_ratelimit.middleware.RatelimitMiddleware',
 ]
-
+RATELIMIT_VIEW = 'web.views.ratelimit_view'
 ROOT_URLCONF = 'config.urls'
 
 TEMPLATES = [
@@ -59,6 +61,16 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db' / 'db.sqlite3',
+    }
+}
+
+CACHES = {
+    'default': {
+        'BACKEND': 'web.cache.CustomFileBasedCache',
+        'LOCATION':  BASE_DIR / 'db' / 'django_cache',
+        'OPTIONS': {
+            'MAX_ENTRIES': 1000,  # Maximum number of cache entries
+        }
     }
 }
 

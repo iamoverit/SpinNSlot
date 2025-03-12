@@ -23,7 +23,7 @@ ENV LC_ALL ru_RU.UTF-8
 RUN pip install --upgrade pip && \
     pip install poetry && \
     poetry config virtualenvs.create false && \
-    poetry install --no-interaction --no-ansi --without dev
+    poetry install --no-interaction --no-ansi
 
 # Copy project files to the container
 COPY src/ .

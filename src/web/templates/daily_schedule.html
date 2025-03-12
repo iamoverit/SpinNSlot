@@ -36,8 +36,10 @@
                                     {{ userSlot.reserved_by.user }}
                                 {% endif %}
                             </button>
-                            {% if userSlot.user.id == user.id or user.is_staff or user.is_superuser %}
+                            {% if user %}
+                            {% if userSlot.reserved_by.user.id == user.id or user.is_staff or user.is_superuser %}
                                 <a href="{% url 'unbook_slot' userSlot.reserved_by.id %}" class="btn btn-outline-danger rounded-circle cancel-btn position-absolute">❌</a>
+                            {% endif %}
                             {% endif %}
                         </div>
                     {% elif userSlot.type == 'tournament' %}
