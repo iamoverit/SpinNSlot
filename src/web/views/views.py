@@ -212,16 +212,17 @@ def weekly_schedule(request, selected_date_str=None):
     }
     return render(request, 'weekly_schedule.html', context)
 
+@ratelimit(key='user', rate='1/s', block=True)
 @login_required(login_url='telegram_login')
 def register_tournament(request, tournament_id):
-    tournament = get_object_or_404(Tournament, pk=tournament_id)
+    tournament = get_object_or_404(Tournament.objects.prefetch_registred_users(), pk=tournament_id)
     
     if TournamentRegistration.objects.filter(user=request.user, tournament=tournament).exists():
         return render(request, 'error.html', {'message': 'Вы уже зарегистрированы на этот турнир'})
-    
-    if tournament.participants.count() >= tournament.max_participants:
+    # TODO: fix needed here
+    count = len(tournament.tournamentregistration_users) + len(tournament.guestparticipant_set.all())
+    if count >= tournament.max_participants:
         return render(request, 'error.html', {'message': 'Достигнут лимит участников'})
-    
     TournamentRegistration.objects.create(user=request.user, tournament=tournament)
     return redirect('tournament_detail', tournament_id=tournament.id)
 

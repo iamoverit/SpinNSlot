@@ -2,6 +2,8 @@ import os
 from pathlib import Path
 from decouple import config
 
+from huey import SqliteHuey
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = config('DJANGO_SECRET_KEY')
@@ -12,6 +14,7 @@ ALLOWED_HOSTS = ['localhost', '127.0.0.1', BASE_HOST]
 CSRF_TRUSTED_ORIGINS = ['https://*.127.0.0.1', f'https://{BASE_HOST}']
 
 INSTALLED_APPS = [
+    'huey.contrib.djhuey',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -56,6 +59,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'config.wsgi.application'
+HUEY = SqliteHuey(filename=str(BASE_DIR / 'db' / 'huey_db.sqlite3'), immediate=False)
 
 DATABASES = {
     'default': {

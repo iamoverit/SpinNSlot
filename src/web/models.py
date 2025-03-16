@@ -1,26 +1,9 @@
 from django.db import models
 from django.db.models import Q, Prefetch
-from django.contrib.auth.models import User
 from django.contrib.auth.models import AbstractUser
 from datetime import timedelta, datetime
 from django.core.validators import MinValueValidator
 from django.utils import timezone
-import requests
-
-def send_telegram_message(chat_id, message):
-    """Отправка сообщения через Telegram Bot API"""
-    bot_token = 'YOUR_BOT_TOKEN'  # Замените на реальный токен бота
-    url = f"https://api.telegram.org/bot{bot_token}/sendMessage"
-    payload = {
-        'chat_id': chat_id,
-        'text': message
-    }
-    try:
-        response = requests.post(url, data=payload)
-        response.raise_for_status()
-    except requests.exceptions.RequestException as e:
-        # Логирование ошибки
-        print(f"Ошибка при отправке сообщения в Telegram: {e}")
 
 class CustomUser(AbstractUser):
     telegram_id = models.CharField(max_length=255, unique=True, blank=True, null=True)
@@ -109,9 +92,9 @@ class TournamentQuerySet(models.QuerySet):
         return self.prefetch_related(
             "guestparticipant_set",
             Prefetch(
-                'tournamentregistration_set',  # Загружаем рецензии
-                queryset=TournamentRegistration.objects.prefetch_related('user'),  # Загружаем пользователей для рецензий
-                to_attr='tournamentregistration_users'  # Сохраняем рецензии в отдельный атрибут
+                'tournamentregistration_set',
+                queryset=TournamentRegistration.objects.prefetch_related('user'),
+                to_attr='tournamentregistration_users'
             ),
         )
 
@@ -191,11 +174,6 @@ class Tournament(models.Model):
             time_slot__lt=self.end_time,
         ).all()
         self.time_slots.add(*[slot.id for slot in slots])
-
-    # @property
-    # def total_participants(self):
-    #     """Общее количество участников (основные + гостевые)"""
-    #     return self.participants.count() + self.guestparticipant_set.count()
 
     def check_participants(self):
         total = self.participants.count() + self.guestparticipant_set.count()
