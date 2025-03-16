@@ -35,6 +35,8 @@ services:
     container_name: huey_worker
     command: python manage.py run_huey
     env_file: .env
+    volumes:
+      - db:/app/db
     depends_on:
       - web
 volumes:
