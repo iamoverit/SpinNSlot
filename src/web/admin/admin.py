@@ -42,7 +42,7 @@ class TournamentAdmin(admin.ModelAdmin):
     form = TournamentForm
     change_form_template = 'admin/web/tournament/change_form.html'
     list_display = ('name', 'date', 'customer', 'start_time_', 'end_time_', 'participants_count', 'min_participants_')
-    list_filter = ('is_training', 'is_finished', 'is_canceled', 'name')
+    list_filter = ('date', 'is_training', 'is_finished', 'is_canceled', 'name')
     filter_horizontal = ('tables',)
     fieldsets = (
         (None, {
