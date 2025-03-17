@@ -2,9 +2,15 @@ services:
   web:
     networks:
       - nginx-proxy
+    environment:
+      - VIRTUAL_HOST=
+      - LETSENCRYPT_HOST=
   nginx:
     networks:
       - nginx-proxy
+    environment:
+      - VIRTUAL_HOST
+      - LETSENCRYPT_HOST
 networks:
   nginx-proxy:
     external: true

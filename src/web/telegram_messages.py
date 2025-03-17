@@ -1,11 +1,18 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 from abc import ABC, abstractmethod
 from django.contrib.auth import get_user_model
 from django.conf import settings
-from huey import crontab
-from huey.contrib.djhuey import task, periodic_task, db_task, on_commit_task
+from huey import CancelExecution, crontab
+from huey.contrib.djhuey import HUEY, task, periodic_task, db_task, on_commit_task
 import requests
 
-CustomUser = get_user_model()
+if TYPE_CHECKING:
+    from .models import CustomUser, Tournament, GuestParticipant
+else:
+    CustomUser = get_user_model()
 
 class NotificationStrategy(ABC):
     @abstractmethod
@@ -14,6 +21,9 @@ class NotificationStrategy(ABC):
     @abstractmethod
     def get_admin_registration_message(self, is_created: bool) -> str: ...
     
+    @abstractmethod
+    def get_user_reminder_message(self, is_created: bool) -> str: ...
+
     @abstractmethod
     def get_admin_group(self) -> str: ...
     
@@ -24,12 +34,12 @@ class NotificationStrategy(ABC):
     def get_reactivation_message(self) -> str: ...
 
 class BaseNotificationStrategy(NotificationStrategy):
-    def __init__(self, tournament, user=None, guest=None):
+    def __init__(self, tournament: Tournament, user: CustomUser=None, guest: GuestParticipant=None):
         self.user = user
         self.guest = guest
         self.tournament = tournament
         self.participants_count = self._calculate_participants_count()
-    
+
     def _calculate_participants_count(self):
         return (
             self.tournament.participants.count() + 
@@ -41,12 +51,12 @@ class BaseNotificationStrategy(NotificationStrategy):
             f"Дата: {self.tournament.date} время: {self.tournament.start_time}\n"
             f"Участников: {self.participants_count}"
         )
-    
+
     def _get_all_participants(self):
         participants = list(self.tournament.participants.all())
         guests = list(self.tournament.guestparticipant_set.filter(user_account__isnull=False))
         return participants + guests
-    
+
     def _send_to_admins(self, message: str):
         admins = CustomUser.objects.filter(
             is_staff=True,
@@ -55,7 +65,7 @@ class BaseNotificationStrategy(NotificationStrategy):
         for admin in admins:
             if admin.telegram_id:
                 send_telegram_message(admin.telegram_id, message)
-    
+
     def _send_to_participants(self, message: str):
         for participant in self._get_all_participants():
             telegram_id = getattr(participant, 'telegram_id', None) or \
@@ -77,7 +87,6 @@ class BaseNotificationStrategy(NotificationStrategy):
             return self._get_guest_registration_message(is_created=is_created)
         return self._get_user_registration_message(is_created=is_created)
 
-# 3. Конкретные стратегии
 class TournamentNotificationStrategy(BaseNotificationStrategy):
     def _get_user_registration_message(self, is_created: bool) -> str:
         base = "🎉 Вы успешно зарегистрировались на турнир {name}\n" if is_created \
@@ -111,6 +120,10 @@ class TournamentNotificationStrategy(BaseNotificationStrategy):
             f"{self._get_common_details()}"
         )
 
+    def get_user_reminder_message(self) -> str:
+        base = '🔔 Напоминание! Турнир "{name}", на который вы зарегистрированы, начнётся через 30 минут. Пожалуйста, прибывайте на место проведения вовремя! 🏆🏓\n'
+        return base.format(name=self.tournament.name) + self._get_common_details()
+
 class TrainingNotificationStrategy(BaseNotificationStrategy):
     def _get_user_registration_message(self, is_created: bool) -> str:
         base = "🎉 Вы успешно зарегистрировались на тренировку \"{name}\"\n" if is_created \
@@ -143,6 +156,10 @@ class TrainingNotificationStrategy(BaseNotificationStrategy):
             f"{self._get_common_details()}"
         )
 
+    def get_user_reminder_message(self) -> str:
+        base = '🔔 Напоминание! Ваша тренировка начнётся через 30 минут. Не забудьте прибыть на место вовремя! 💪🏓\n'
+        return base.format(name=self.tournament.name) + self._get_common_details()
+
 class NotificationStrategyFactory:
     @staticmethod
     def create(tournament, user=None, guest=None) -> NotificationStrategy:
@@ -154,12 +171,12 @@ class NotificationService:
     def __init__(self, strategy: NotificationStrategy):
         self.strategy: BaseNotificationStrategy = strategy
     
-    def send_registration_update(self, user, is_created: bool):
+    def send_registration_update(self, is_created: bool):
         admin_msg = self.strategy.get_admin_registration_message(is_created)
         message = self.strategy.get_user_registration_message(is_created)
-        send_telegram_message(user.telegram_id, message)
+        send_telegram_message(self.strategy.user.telegram_id, message)
         self.strategy._send_to_admins(admin_msg)
-    
+
     def send_cancellation_notices(self):
         admin_msg = self.strategy.get_cancellation_message(for_admin=True)
         user_msg = self.strategy.get_cancellation_message(for_admin=False)
@@ -169,7 +186,11 @@ class NotificationService:
     def send_reactivation_notices(self):
         message = self.strategy.get_reactivation_message()
         self.strategy._send_to_participants(message)
-    
+
+    @task()
+    def send_tournament_reminder(self):
+        message = self.strategy.get_user_reminder_message()
+        self.strategy._send_to_participants(message)
 
 @task(retries=3, retry_delay=10)
 def send_telegram_message(chat_id, text):

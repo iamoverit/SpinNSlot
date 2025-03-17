@@ -28,8 +28,5 @@ RUN pip install --upgrade pip && \
 # Copy project files to the container
 COPY src/ .
 
-# Expose port 8000
-EXPOSE 8000
-
 # Run the application with Gunicorn
 CMD ["gunicorn", "--config", "gunicorn_config.py", "config.wsgi:application"]
