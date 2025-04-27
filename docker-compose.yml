@@ -18,6 +18,7 @@ services:
       - TELEGRAM_LOGIN_REDIRECT_URL
       - VIRTUAL_HOST=
       - LETSENCRYPT_HOST=
+    restart: always
   nginx:
     build: ./nginx
     env_file: .env
@@ -29,6 +30,7 @@ services:
       - ${NGINX_PORT:-}:80
     depends_on:
       - web
+    restart: always
   huey_worker:
     build: .
     container_name: huey_worker
@@ -41,6 +43,7 @@ services:
     environment:
       - VIRTUAL_HOST=
       - LETSENCRYPT_HOST=
+    restart: always
 volumes:
   db:
   static_volume:
