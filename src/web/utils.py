@@ -1,5 +1,6 @@
 import datetime
 import dataclasses
+from django.conf import settings
 
 @dataclasses.dataclass
 class DaySlot:
@@ -46,7 +47,9 @@ def get_week_range(selected_date):
     weekday = selected_date.weekday()
 
     # Вычисляем понедельник и воскресенье
-    monday = selected_date - datetime.timedelta(days=weekday)
+    monday = selected_date
+    if settings.WEEK_START_FROM_MONDAY:
+        monday = selected_date - datetime.timedelta(days=weekday)
     sunday = monday + datetime.timedelta(days=6)
 
     return monday, sunday
