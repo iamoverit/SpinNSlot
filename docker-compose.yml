@@ -46,4 +46,6 @@ services:
     restart: always
 volumes:
   db:
+    external:
+      name: spinnslot_db
   static_volume:
