@@ -8,7 +8,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = config('DJANGO_SECRET_KEY')
 
-DEBUG = config('DEBUG')
+DEBUG = config('DEBUG', cast=bool)
 WEEK_START_FROM_MONDAY = config('WEEK_START_FROM_MONDAY', cast=bool)
 BASE_HOST = config('BASE_HOST')
 ALLOWED_HOSTS = ['localhost', '127.0.0.1', BASE_HOST]
