@@ -127,6 +127,13 @@
                             {% if is_registered %}
                             <div class="alert alert-success">
                                 <h5>✅ Вы зарегистрированы!</h5>
+                                <form method="post" action="{% url 'unregister_tournament' tournament.id %}">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-outline-danger btn-sm">
+                                        <span class="btn btn-close btn-sm"></span> <span class="align-middle">Отменить своё участие </span> 
+                                    </button>
+                                </form>
+
                                 <p class="mb-0">Всего участников: {{ total_participants }}</p>
                                 <p class="mb-0 small">Дата регистрации: {{ registration_date|date:"j E Y H:i" }}</p>
                                 
@@ -156,6 +163,7 @@
                                         </button>
                                     </div>
                                 </form>
+
                             </div>
                             {% else %}
                             <div class="d-grid gap-2">

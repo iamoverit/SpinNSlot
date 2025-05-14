@@ -226,6 +226,18 @@ def register_tournament(request, tournament_id):
     TournamentRegistration.objects.create(user=request.user, tournament=tournament)
     return redirect('tournament_detail', tournament_id=tournament.id)
 
+@ratelimit(key='user', rate='1/s', block=True)
+@login_required(login_url='telegram_login')
+def unregister_tournament(request, tournament_id):
+    tournament = get_object_or_404(Tournament.objects.prefetch_registred_users(), pk=tournament_id)
+
+    tournamentRegistration = TournamentRegistration.objects.filter(user=request.user, tournament=tournament)
+    if tournamentRegistration.exists():
+        tournamentRegistration.delete()
+    else:
+        return render(request, 'error.html', {'message': 'You are not registred for the selected tournament!'})
+    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
 @ratelimit(key='user', rate='10/h', block=False)
 @login_required(login_url='telegram_login')
 def book_slot(request, time_slot_id, item_slot_id, reservation_date_str):
