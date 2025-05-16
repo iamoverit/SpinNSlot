@@ -11,7 +11,7 @@ WORKDIR /app
 # Copy dependency definitions to the container
 COPY pyproject.toml poetry.lock README.md gunicorn_config.py ./
 
-RUN apt-get update && apt-get install -y locales && \
+RUN apt-get update && apt-get install -y locales cron && \
     sed -i '/ru_RU.UTF-8/s/^# //g' /etc/locale.gen && \
     locale-gen ru_RU.UTF-8
 
