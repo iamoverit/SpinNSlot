@@ -2,7 +2,9 @@ services:
   web:
     build: .
     command: >
-      sh -c "python manage.py migrate && python manage.py collectstatic --noinput && gunicorn --config gunicorn_config.py config.wsgi:application"
+      sh -c "python manage.py migrate && 
+      python manage.py collectstatic --noinput && 
+      gunicorn --config gunicorn_config.py config.wsgi:application"
     env_file: .env
     volumes:
       - db:/app/db
