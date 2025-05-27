@@ -1,2 +1,3 @@
-from .telegram_auth import TelegramLogoutView, TelegramLoginView, TelegramAuthView
+from .telegram_auth import *
 from .views import *
+from .user import *

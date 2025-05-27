@@ -4,13 +4,24 @@ import time
 from django.conf import settings
 from django.shortcuts import render, redirect
 from django.views import View
+from django.contrib import messages
 from django.contrib.auth import login, logout
+from .forms import UserUpdateForm
 
 from web.models import CustomUser
 
 class TelegramLoginView(View):
     def get(self, request):
-        return render(request, "telegram_login.html")
+        if request.user.is_authenticated:
+            form = UserUpdateForm(instance=request.user)    
+        else:
+            # Для неаутентифицированных - пустую форму (или None)
+            form = None
+            messages.warning(request, 'Необходимо войти в систему')
+        return render(request, 'telegram_login.html', {
+            'form': form,
+            'is_authenticated': request.user.is_authenticated
+        })
 
 class TelegramAuthView(View):
     def get(self, request):

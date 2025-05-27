@@ -26,10 +26,10 @@
                 </ul>
                 <div class="user-info dropdown">
                     {% if request.user.is_authenticated %}
-                        <span class="user-name logout-button">
+                        <a class="btn btn-primary" href="{% url 'user_update' %}">
                             <div class="telegram-icon"></div>
-                            {{ request.user }}!
-                        </span>
+                            {{ request.user }}&nbsp;
+                        </a>
                         {% if request.user.avatar_url %}
                         <img src="{{ request.user.avatar_url }}" alt="Image" class="circle-image menu-trigger dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
                         {% else %}
@@ -46,6 +46,7 @@
                         </div>
                         {% endif %}
                         <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                            <li><a href="{% url 'user_update' %}" class="btn btn-danger dropdown-item">Profile</a></li>
                             <li><a href="{% url 'logout' %}" class="btn btn-danger dropdown-item">Logout</a></li>
                         </ul>
                     {% else %}

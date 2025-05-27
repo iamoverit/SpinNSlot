@@ -14,15 +14,34 @@
  </a>
 </div>
 {% else %}
-<ul class="list-group">
-    <li class="list-group-item">ID: {{ user.id }}</li>
-    <li class="list-group-item">Picture: <img src="{{ user.avatar_url }}" alt="No image"></li>
-    <li class="list-group-item">Username: @{{ user.username }}</li>
-    <li class="list-group-item">Showname: {{ user }}</li>
-    <li class="list-group-item">First name: {{ user.first_name }}</li>
-    <li class="list-group-item">Last name: {{ user.last_name }}</li>
-    <li class="list-group-item">Telegram id: {{ user.telegram_id }}</li>
-    <li class="list-group-item"><a href="{% url 'logout' %}">Выйти</li>
-</ul>
+
+<form method="post" action="{% url 'user_update' %}">
+    {% csrf_token %}
+    <ul class="list-group">
+        
+        <li class="list-group-item">ID: {{ user.id }}</li>
+        <li class="list-group-item">Picture: <img src="{{ user.avatar_url }}" alt="No image"></li>
+        <li class="list-group-item">Username: @{{ user.username }}</li>
+        <li class="list-group-item">Telegram id: {{ user.telegram_id }}</li>
+        <li class="list-group-item">Showname: {{ user }}</li>
+        <li class="list-group-item">
+            <div class="form-group">
+                <label for="id_first_name">Имя</label>
+                {{ form.first_name }}
+            </div>
+            
+            <div class="form-group">
+                <label for="id_last_name">Фамилия</label>
+                {{ form.last_name }}
+            </div>
+        </li>
+        <li class="list-group-item d-flex justify-content-between">
+            <button type="submit" class="btn btn-primary btn-block">
+                Сохранить изменения
+            </button>
+            <a type="button" class="btn btn-outline-danger" href="{% url 'logout' %}">Выйти</a>
+        </li>
+    </ul>
+</form>
 {% endif%}
 {% endblock %}

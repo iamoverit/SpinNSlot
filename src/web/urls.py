@@ -1,7 +1,6 @@
 from django.urls import path, include
 from django.contrib.auth import views as auth_views
 from django.conf import settings
-from . import views
 from .views import *
 
 urlpatterns = [
@@ -18,10 +17,12 @@ urlpatterns = [
     path('tournaments/<int:tournament_id>/register/', views.register_tournament, name='register_tournament'),
     path('tournaments/<int:tournament_id>/unregister/', views.unregister_tournament, name='unregister_tournament'),
     path('tournaments/<int:tournament_id>/add-guest/', views.add_guest_participant, name='add_guest'),
-    
+
     path('logout/', TelegramLogoutView.as_view(), name='logout'),
     path("login/", TelegramLoginView.as_view(), name="telegram_login"),
     path("auth/", TelegramAuthView.as_view(), name="telegram_auth"),
+
+    path("user/update/", user.user_update, name="user_update"),
 ]
 
 if settings.DEBUG:

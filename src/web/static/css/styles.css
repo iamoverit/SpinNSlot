@@ -26,32 +26,6 @@ body {
     gap: 10px; /* Расстояние между картинкой и именем */
     margin-bottom: 20px;
 }
-.user-name {
-    font-size: 18px; /* Размер текста */
-    font-weight: bold; /* Жирный текст */
-}
-.logout-button {
-    background-color: #54a9eb; /* Основной цвет кнопки */
-    color: white; /* Цвет текста */
-    font-size: 18px; /* Размер текста */
-    font-weight: bold; /* Жирный текст */
-    padding: 5px 10px; /* Внутренние отступы */
-    border: none; /* Убирает стандартную рамку */
-    border-radius: 25px; /* Закругленные углы */
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2); /* Тень для объема */
-    cursor: pointer; /* Указывает, что элемент кликабельный */
-    transition: transform 0.2s, box-shadow 0.2s; /* Анимация при наведении */
-    }
-
-.logout-button:hover {
-    transform: translateY(-2px); /* Поднимает кнопку */
-    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.3); /* Усиливает тень */
-}
-
-.logout-button:active {
-    transform: translateY(2px); /* Эффект нажатия */
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Уменьшает тень */
-}
 
 .menu-container {
     position: relative; /* Для позиционирования подменю */
