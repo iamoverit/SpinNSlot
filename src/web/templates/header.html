@@ -1,4 +1,6 @@
 {% load static %}
+{% load custom_filters %}
+
 <link rel="shortcut icon" type="image/png" href="{% static 'favicon.ico' %}"/>
 <header>
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
@@ -31,19 +33,11 @@
                             {{ request.user }}&nbsp;
                         </a>
                         {% if request.user.avatar_url %}
-                        <img src="{{ request.user.avatar_url }}" alt="Image" class="circle-image menu-trigger dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                            <img src="{{ request.user.avatar_url }}" alt="Image" class="circle-image menu-trigger dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
                         {% else %}
-                        <div class="circle-logo menu-trigger dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
-                            {% if request.user.first_name %}
-                            {% with username_initials=request.user.first_name|slice:":1"|capfirst|add:request.user.last_name|slice:":2"|capfirst %}
-                            {{ username_initials }}
-                            {% endwith %}
-                            {% else %}
-                            {% with username_initials=request.user.username|slice:":1"|capfirst %}
-                            {{ username_initials }}
-                            {% endwith %}
-                            {% endif %}
-                        </div>
+                            <div class="circle-logo menu-trigger dropdown-toggle" style="background-color: {{ request.user|string_to_color }}" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                                {{ request.user|initials }}
+                            </div>
                         {% endif %}
                         <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                             <li><a href="{% url 'user_update' %}" class="btn btn-danger dropdown-item">Profile</a></li>

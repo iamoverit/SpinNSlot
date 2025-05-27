@@ -50,6 +50,7 @@ def tournament_detail(request, tournament_id):
     # Все гостевые участники
     guest_participants_all = tournament.guestparticipant_set.all()
     
+    tournament.participants_list = list(p.user for p in main_participants) + list(g.full_name for g in guest_participants_all)
     # Словарь с датами регистрации для отображения
     registration_dates = {
         reg.user_id: reg.registration_date 

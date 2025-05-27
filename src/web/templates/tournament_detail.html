@@ -29,7 +29,7 @@
                         </dd>
                         
                         <dt class="col-sm-4">Участники:</dt>
-                        <dd class="col-sm-8">
+                        <dd class="col-sm-8 btn border-0 top-0 end-0" id="participants_list-{{ tournament.id }}" data-bs-toggle="dropdown">
                             <div class="progress" style="height: 25px;">
                                 <div class="progress-bar" 
                                     role="progressbar" 
@@ -37,6 +37,23 @@
                                     {{ total_participants }}/{{ tournament.max_participants }}
                                 </div>
                             </div>
+                            <ul class="dropdown-menu" aria-labelledby="participants_list-{{ tournament.id }}">
+                                <li><h6 class="dropdown-header">Participants list</h6></li>
+                                {% for name in tournament.participants_list %}
+                                    <li>
+                                        <a class="dropdown-item" href="#">
+                                        <div class="d-flex align-items-center">
+                                            {% if name.avatar_url %}
+                                                <img src="{{ name.avatar_url }}" alt="Image" class="circle-image menu-trigger dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                                            {% else %}
+                                                {{ name|initials_badge }}
+                                            {% endif %}
+                                            <div class="ps-2">{{ name }}</div>
+                                        </div>
+                                        </a>
+                                    </li>
+                                {% endfor %}
+                            </ul>
                         </dd>
                     </dl>
                     
@@ -67,6 +84,9 @@
                                 {% for user_registration in main_participants %}
                                 <li class="list-group-item d-flex justify-content-between align-items-center">
                                     <div>
+                                        <img src="{{ user_registration.user.avatar_url }}" alt="{{ name }}"
+                                            style="height: 1.5em; width: 1.5em; object-fit: cover; margin-right: 0.5em;" 
+                                            class="rounded">
                                         {{ user_registration.user.get_full_name|default:user_registration.user.username }}
                                         {% if user_registration.user == request.user %}
                                         <span class="badge bg-primary ms-2">Вы</span>

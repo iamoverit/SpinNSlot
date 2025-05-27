@@ -63,7 +63,18 @@
                             <ul class="dropdown-menu" aria-labelledby="participants_list-{{ userSlot.reserved_by.id }}">
                                 <li><h6 class="dropdown-header">Participants list</h6></li>
                                 {% for name in userSlot.reserved_by.participants_list %}
-                                    <li><a class="dropdown-item" href="#">{{ name }}</a></li>
+                                    <li>
+                                        <a class="dropdown-item" href="#">
+                                        <div class="d-flex align-items-center">
+                                            {% if name.avatar_url %}
+                                                <img src="{{ name.avatar_url }}" alt="Image" class="circle-image menu-trigger dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                                            {% else %}
+                                                {{ name|initials_badge }}
+                                            {% endif %}
+                                            <div class="ps-2">{{ name }}</div>
+                                        </div>
+                                        </a>
+                                    </li>
                                 {% endfor %}
                             </ul>
                         </div>
