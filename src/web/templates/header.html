@@ -36,7 +36,7 @@
                             {{ request.user }}&nbsp;
                         </a>
                         {% if request.user.avatar_url %}
-                            <img src="{{ request.user.avatar_url }}" alt="Image" class="circle-image menu-trigger dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                            <img src="{{ request.user.avatar_url }}" alt="Image" class="circle-image menu-trigger dropdown-toggle" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
                         {% else %}
                             <div class="circle-logo menu-trigger dropdown-toggle" style="background-color: {{ request.user|string_to_color }}" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
                                 {{ request.user|initials }}
