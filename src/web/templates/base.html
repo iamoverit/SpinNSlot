@@ -1,35 +1,20 @@
-<!DOCTYPE html>
+{% extends 'bootstrap.html' %}
+
+{% load django_bootstrap5 %}
 {% load static %}
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{% block title %}{{customer.name}}{% endblock %}</title>
-    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
-    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
-</head>
-<body class="d-flex flex-column min-vh-100">
-    {% include 'header.html' %}
-    
-    <main class="container mt-4 flex-grow-1">
-        {% if messages %}
-        <div class="messages">
-            {% for message in messages %}
-            <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %} alert-dismissible fade show" role="alert">
-                {{ message }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-            {% endfor %}
-        </div>
-        {% endif %}
-        
-        {% block content %}{% endblock %}
-    </main>
+<title>{% block title %}{{customer.name}}{% endblock %}</title>
 
-    {% include 'footer.html' %}
+{% block bootstrap5_content %}
+<link rel="stylesheet" href="{% static 'css/styles.css' %}">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+{% include 'header.html' %}
+    <div class="container">
+        {% autoescape off %}{% bootstrap_messages %}{% endautoescape %}
 
-    <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
-    {% block extra_js %}{% endblock %}
-</body>
-</html>
+        {% block content %}(no content){% endblock %}
+    </div>
+{% include 'footer.html' %}
+{% block extra_js %}
+    <script src="{% static 'js/color_mode_toggle.js' %}"></script>
+{% endblock %}
+{% endblock %}

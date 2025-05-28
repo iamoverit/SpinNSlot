@@ -23,6 +23,7 @@ urlpatterns = [
     path("auth/", TelegramAuthView.as_view(), name="telegram_auth"),
 
     path("user/update/", user.user_update, name="user_update"),
+    path('user/set-theme/', user.set_theme, name='set_theme'),
 ]
 
 if settings.DEBUG:

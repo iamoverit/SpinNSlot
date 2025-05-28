@@ -6,7 +6,7 @@
 {% block content %}
 
 <div class="container mt-4">
-    <h2>Upcoming Tournaments</h2>
+    <h2>Предстоящие турниры</h2>
     <div class="row">
         {% for tournament in tournaments %}
         <div class="col-md-6 mb-4">
@@ -26,13 +26,13 @@
                                 {{ tournament.participants_list|length }}/{{ tournament.max_participants }}
                             </div>
                             <ul class="dropdown-menu" aria-labelledby="participants_list-{{ tournament.id }}">
-                                <li><h6 class="dropdown-header">Participants list</h6></li>
+                                <li><h6 class="dropdown-header">Список участников</h6></li>
                                 {% for name in tournament.participants_list %}
                                     <li>
                                         <a class="dropdown-item" href="#">
                                         <div class="d-flex align-items-center">
                                             {% if name.avatar_url %}
-                                                <img src="{{ name.avatar_url }}" alt="Image" class="circle-image menu-trigger dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                                                <img src="{{ name.avatar_url }}" alt="Image" class="circle-image menu-trigger dropdown-toggle" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
                                             {% else %}
                                                 {{ name|initials_badge }}
                                             {% endif %}
@@ -45,7 +45,7 @@
                         </div>
                     </div>
                         {% if tournament.is_cancelled %}
-                        <span class="badge bg-danger">Canceled</span>
+                        <span class="badge bg-danger">Отменён</span>
                         {% endif %}
                     </div>
 
@@ -69,7 +69,7 @@
                         </button>
                     </div>
                     <a href="{% url 'tournament_detail' tournament.id %}" class="btn btn-primary btn-sm">
-                        View Details
+                        Подробнее
                     </a>
                 </div>
             </div>
@@ -81,5 +81,9 @@
         {% endfor %}
     </div>
 </div>
-<script src="{% static 'js/floating_collapse.js' %}"></script>
+
+{% endblock %}
+
+{% block extra_js %}
+    {{ block.super }}
 {% endblock %}

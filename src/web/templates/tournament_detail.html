@@ -38,13 +38,13 @@
                                 </div>
                             </div>
                             <ul class="dropdown-menu" aria-labelledby="participants_list-{{ tournament.id }}">
-                                <li><h6 class="dropdown-header">Participants list</h6></li>
+                                <li><h6 class="dropdown-header">Список участников</h6></li>
                                 {% for name in tournament.participants_list %}
                                     <li>
                                         <a class="dropdown-item" href="#">
                                         <div class="d-flex align-items-center">
                                             {% if name.avatar_url %}
-                                                <img src="{{ name.avatar_url }}" alt="Image" class="circle-image menu-trigger dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                                                <img src="{{ name.avatar_url }}" alt="Image" class="circle-image menu-trigger dropdown-toggle" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
                                             {% else %}
                                                 {{ name|initials_badge }}
                                             {% endif %}
@@ -76,7 +76,7 @@
                         
                         <!-- Основные участники -->
                         <div class="card mb-3">
-                            <div class="card-header bg-light">
+                            <div class="card-header">
                                 <i class="bi bi-person-check"></i>
                                 Основные участники ({{ main_participants|length }})
                             </div>
@@ -104,7 +104,7 @@
 
                         <!-- Гостевые участники -->
                         <div class="card">
-                            <div class="card-header bg-light">
+                            <div class="card-header">
                                 <i class="bi bi-person-plus"></i>
                                 Гостевые участники ({{ guest_participants_all|length }})
                             </div>
@@ -210,4 +210,8 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+    {{ block.super }}
 {% endblock %}

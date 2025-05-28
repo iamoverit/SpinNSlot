@@ -8,27 +8,23 @@
     }
 }
 
-body {
-    font-family: "Lucida Grande","Lucida Sans Unicode",Arial,Helvetica,Verdana,sans-serif; /* Изменяет шрифт для всего документа */
-}
-
 .circle-image {
-    display: inline-block;
-    vertical-align: top;
     width: 36px;
     height: 36px;
+    object-fit: cover; 
+    margin-right: 0.5em;
     border-radius: 18px;
 }
 .user-info {
-    display: flex; /* Включает Flexbox */
-    align-items: center; /* Выравнивает элементы по вертикали */
+    display: flex;
+    align-items: center;
     justify-content: flex-end;
-    gap: 10px; /* Расстояние между картинкой и именем */
+    gap: 10px;
     margin-bottom: 20px;
 }
 
 .menu-container {
-    position: relative; /* Для позиционирования подменю */
+    position: relative;
     display: inline-block;
 }
 
@@ -114,44 +110,35 @@ body {
     border-radius: 20px;
     background: url('data:image/svg+xml,%3Csvg%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20width%3D%2224%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cpath%20d%3D%22m1.95617055%2011.392196c5.77764656-2.42328736%209.63031585-4.02086673%2011.55800785-4.79273807%205.5039525-2.20384954%206.6476266-2.5866818%207.3930574-2.59932314.1639507-.00278035.5305319.0363352.7679878.22182361.2005031.15662277.2556695.36819788.2820684.51669348.026399.1484956.0592719.48677234.0331404.75109194-.2982611%203.0169019-1.5888322%2010.33812718-2.2454015%2013.71710898-.2778191%201.4297738-.8288514%201.7357846-1.3584441%201.7826999-1.1509274.1019576-2.0208916-.5588425-3.1356211-1.2622918-1.7443316-1.1007592-2.3854935-1.3972358-4.0786694-2.4713734-1.95675765-1.2413519-.8891962-1.8911034.2259543-3.0061212.2918402-.2918054%205.3989024-4.83750096%205.497052-5.24030969.0122753-.05037796-.1557336-.55407742-.2716182-.65323489-.1158847-.09915747-.2869204-.06524947-.4103446-.03828214-.17495.03822537-2.9615423%201.81132342-8.35977698%205.31929412-.79096496.5228681-1.50739646.7776269-2.1492945.7642766-.70764107-.0147176-2.06885864-.3851791-3.08078398-.7018404-1.24116762-.388398-1.69932554-.5713149-1.61342745-1.2309348.04474105-.3435709.36011227-.7024173.94611366-1.0765391z%22%20fill%3D%22%23fff%22%20fill-rule%3D%22evenodd%22%2F%3E%3C%2Fsvg%3E') no-repeat 0 -1px;
 }
+
 .circle-logo {
     display: flex;
     align-items: center;
     justify-content: center;
     width: 36px;
     height: 36px;
-    background-color: #0088cc; /* Цвет фона */
-    color: white; /* Цвет буквы */
+    color: white;
     font-size: 12px;
     font-weight: bold;
     border-radius: 50%;
     text-align: center;
-    user-select: none; /* Запрет выделения текста */
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Легкая тень */
-}
-
-/* Footer styles */
-.footer {
-    position: relative;
-    width: 100%;
-    background-color: #f8f9fa;
-    border-top: 1px solid #dee2e6;
-    margin-top: auto;
+    user-select: none;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .book-btn {
-    background-color: #4CAF50; /* Приятный зеленый */
+    background-color: #4CAF50;
     border-color: #45a049;
     color: white;
     transition: background-color 0.3s ease;
 }
 
 .book-btn:hover {
-    background-color: #45a049; /* Темнее при наведении */
+    background-color: #45a049;
 }
 
 .book-btn:active {
-    background-color: #3d8b40; /* Еще темнее при нажатии */
+    background-color: #3d8b40;
     transform: scale(0.98);
 }
 
@@ -181,17 +168,6 @@ body {
     transform: scale(0.95);
 }
 
-.date-picker-container {
-    margin-bottom: 20px;
-    margin-top: 20px;
-    padding: 15px;
-    background: #f5f5f5;
-    border-radius: 4px;
-    display: flex;
-    align-items: center;
-    gap: 15px;
-}
-
 .selected-date {
     font-size: 14px;
     color: #555;
@@ -204,18 +180,6 @@ body {
 .selected-date strong {
     font-weight: 600;
     color: #333;
-}
-
-.date-picker-container label {
-    margin-right: 10px;
-    font-weight: bold;
-}
-
-.date-picker-container input[type="date"] {
-    padding: 5px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    font-size: 14px;
 }
 
 .date-picker {
@@ -252,7 +216,7 @@ body {
 }
 .partial-collapse.collapse:not(.show) {
     display: block;
-    height: 80px; /* Высота в свернутом состоянии */
+    height: 80px;
     overflow: hidden;
     transition: height 0.5s ease-in-out;
 }
@@ -262,7 +226,6 @@ body {
     transition: height 0.35s ease;
 }
 
-/* Градиент для плавного перехода */
 .partial-collapse {
     position: relative;
 }
@@ -274,42 +237,38 @@ body {
     left: 0;
     right: 0;
     height: 50px;
-    background: linear-gradient(to bottom, transparent, white);
-    pointer-events: none; /* Чтобы градиент не перекрывал клики */
+    background: linear-gradient(to bottom, transparent, rgba(var(--bs-body-bg-rgb), 1));
+    pointer-events: none; 
     transition: opacity 0.3s ease;
 }
 
 .partial-collapse.collapse.show::after {
-    opacity: 0; /* Скрываем градиент при раскрытии */
+    opacity: 0;
 }
 
-/* Стрелочка */
 .toggle-partial-collapse {
     position: absolute;
-    left: 50%; /* Центрируем по горизонтали */
-    
-    transform: translateX(-50%); /* Точное центрирование */
-    background-color: white; /* Фон кнопки */
+    left: 50%; 
+    transform: translateX(-50%);
     padding: 5px 10px;
     cursor: pointer;
-    z-index: 1; /* Чтобы кнопка была поверх текста */
+    z-index: 1;
 }
 
 .toggle-partial-collapse::after {
     content: '';
     position: absolute;
-    left: 50%; /* Центрируем по горизонтали */
+    left: 50%;
     top: 50%;
     transform: translateY(-50%);
     width: 0;
     height: 0;
     border-left: 6px solid transparent;
     border-right: 6px solid transparent;
-    border-top: 6px solid #000; /* Стрелочка вниз */
+    border-top: 6px solid #000;
     transition: transform 0.3s ease;
 }
 
-/* Анимация стрелочки при раскрытии */
 #tournament-card[aria-expanded="true"] .toggle-partial-collapse::after {
-    transform: translateY(-50%) rotate(180deg); /* Стрелочка вверх */
+    transform: translateY(-50%) rotate(180deg);
 }

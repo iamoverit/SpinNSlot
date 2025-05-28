@@ -1,17 +1,16 @@
 {% extends 'base.html' %}
 {% load custom_filters %}
 {% load static %}
-
+{% load django_bootstrap5 %}
 {% block content %}
 
 <main class="content container-fluid p-0">
-<!-- your app -->
-    <div class="date-picker-container">
-        <label for="date-picker">Select Date:</label>
-        <input type="date" id="date-picker" value="{{ selected_date|date:'Y-m-d' }}" min="{{ today|date:'Y-m-d' }}" data-url="{% url 'weekly_schedule' '0000-00-00' %}">
-        <span class="selected-date">
-            Showing reservations for: 
-            <strong>{{ selected_date|date:"F j, Y" }}</strong>
+    <div class="input-group mb-3">
+        <label class="input-group-text" for="date-picker">Дата</label>
+        <input class="btn btn-secondary" placeholder="" type="date" id="date-picker" value="{{ selected_date|date:'Y-m-d' }}" min="{{ today|date:'Y-m-d' }}" data-url="{% url 'weekly_schedule' '0000-00-00' %}">
+        <label class="form-control"></label>
+        <span class="input-group-text">
+            Бронирование за:&nbsp;<strong>{{ selected_date|date:"F j, Y" }}</strong>
         </span>
     </div>
 
@@ -46,7 +45,7 @@
                     {% elif userSlot.type == 'tournament' %}
                         <div class="w-100 h-100 d-flex align-items-center justify-content-center flex-shrink-0 position-relative" style="grid-row: span {{ userSlot.rowspan }}; grid-column: span {{ userSlot.colspan }};">
                             <a href="{% url 'tournament_detail' userSlot.reserved_by.id %}" 
-                            class="btn d-block p-0 rounded-0 bg-gradient btn-{% if userSlot.reserved_by.is_training %}info{% else %}warning{% endif %} w-100 h-100 d-flex align-items-center justify-content-center flex-shrink-0"
+                            class="btn d-block p-0 rounded-0 bg-gradient bg-{% if userSlot.reserved_by.is_training %}info{% else %}primary{% endif %}-subtle w-100 h-100 d-flex align-items-center justify-content-center flex-shrink-0"
                             style="min-width: 0; font-size: clamp(11px, 2vw, 16px);"
                             data-time="{{ userSlot.id }}">
                             <ul class="list-group list-group-flush d-flex align-items-center justify-content-center pt-0"
@@ -61,13 +60,13 @@
                             style="min-width: 0; filter: hue-rotate(90deg) saturate(000%); font-size: clamp(11px, 2vw, 16px);"
                             id="participants_list-{{ userSlot.reserved_by.id }}" data-bs-toggle="dropdown">&#128100; {{ userSlot.reserved_by.participants_list|length }}</div>
                             <ul class="dropdown-menu" aria-labelledby="participants_list-{{ userSlot.reserved_by.id }}">
-                                <li><h6 class="dropdown-header">Participants list</h6></li>
+                                <li><h6 class="dropdown-header">Список участников</h6></li>
                                 {% for name in userSlot.reserved_by.participants_list %}
                                     <li>
                                         <a class="dropdown-item" href="#">
                                         <div class="d-flex align-items-center">
                                             {% if name.avatar_url %}
-                                                <img src="{{ name.avatar_url }}" alt="Image" class="circle-image menu-trigger dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                                                <img src="{{ name.avatar_url }}" alt="Image" class="circle-image menu-trigger dropdown-toggle" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
                                             {% else %}
                                                 {{ name|initials_badge }}
                                             {% endif %}
@@ -84,7 +83,7 @@
                             class="btn btn-outline-success border-0 w-100 h-100 d-flex align-items-center justify-content-center flex-shrink-0"
                             style="min-width: 0; font-size: clamp(11px, 2vw, 16px);"
                             data-time="{{ timeSlot.id }}" 
-                            data-item="{{ day }}">Rent</a>
+                            data-item="{{ day }}">Арен.</a>
                         </div>
                     {% endif %}
                     {% endif %}
@@ -95,19 +94,9 @@
     </div>
 </main>
 
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const datePicker = document.getElementById('date-picker');
-        
-        // Update page when date changes
-        datePicker.addEventListener('change', function() {
-            const selectedDate = this.value;
-            const baseUrl = this.dataset.url;
-            const newUrl = baseUrl.replace('0000-00-00', selectedDate);
-            window.location.href = newUrl;
-        });
-    });
-</script>
-<script src="{% static 'js/floating_collapse.js' %}"></script>
 {% endblock %}
 
+{% block extra_js %}
+    {{ block.super }}
+    <script src="{% static 'js/datetime_picker.js' %}"></script>
+{% endblock %}
