@@ -26,7 +26,7 @@ from django.db import connection
 def tournament_list(request):
     yesterday = datetime.datetime.now() - datetime.timedelta(days=1)
     
-    tournaments = Tournament.objects.filter(is_finished=False, is_canceled=False, date__gt=yesterday).prefetch_registred_users().all()
+    tournaments = Tournament.objects.filter(is_finished=False, is_canceled=False, date__gt=yesterday).order_by('date', 'start_time').prefetch_registred_users().all()
 
     for tournament in tournaments:
         participants = tournament.tournamentregistration_users
