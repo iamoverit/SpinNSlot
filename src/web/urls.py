@@ -24,6 +24,9 @@ urlpatterns = [
 
     path("user/update/", user.user_update, name="user_update"),
     path('user/set-theme/', user.set_theme, name='set_theme'),
+
+    path("live/", VKLiveView.as_view(), name="live"),
+
 ]
 
 if settings.DEBUG:

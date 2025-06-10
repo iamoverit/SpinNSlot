@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load custom_filters %}
+{% load markdownify %}
+
+{% block content %}
+
+{% if is_live %}
+  <iframe 
+    src="{{ player_url }}"
+    width="640" 
+    height="480"
+    frameborder="1" 
+    allowfullscreen>
+  </iframe>
+{% else %}
+  <p>Прямая трансляция отсутствует.</p>
+{% endif %}
+
+{% endblock %}
+
+{% block extra_js %}
+    {{ block.super }}
+{% endblock %}
