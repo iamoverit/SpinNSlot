@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 {% load django_bootstrap5 %}
 {% load i18n %}
+{% load static %}
 {% get_current_language as LANGUAGE_CODE %}
 {% bootstrap_setting "color_mode" as COLOR_MODE %}
 {% bootstrap_setting "javascript_in_head" as BOOTSTRAP_JAVASCRIPT_IN_HEAD %}
@@ -9,10 +10,12 @@
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta property="og:image" content="{% static 'images/27ddbd15-33c5-4374-8cbb-fa9922c07f99-wide.png' %}">
     <!-- Page title -->
     <title>{% block bootstrap5_title %}{% block title %}{% endblock %}{% endblock %}</title>
     <!-- Bootstrap CSS -->
     {% bootstrap_css %}
+    <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap-icons.min.css' %}">
     <!-- Bootstrap JavaScript if it is in head -->
     {% if BOOTSTRAP_JAVASCRIPT_IN_HEAD %}{% bootstrap_javascript %}{% endif %}
 
