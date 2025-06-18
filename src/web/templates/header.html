@@ -26,8 +26,11 @@
                         <a class="nav-link {% if '/tournaments/' in request.path %}active{% endif %}" href="{% url 'tournament_list' %}">Турниры</a>
                     </li>
                 </ul>
-                <button id="theme-toggle" class="btn btn-link" title="Сменить тему">
-                    <i class="bi bi-sun-fill"></i>
+                <button id="theme-toggle" class="btn btn-link" 
+                        title="Сменить тему"
+                        data-csrf="{{ csrf_token }}"
+                        data-current-theme="{{ request.session.theme|default:'light' }}">
+                    <i class="bi {% if request.session.theme == 'dark' %}bi-sun{% else %}bi-moon{% endif %}"></i>
                 </button>
                 <div class="dropdown">
                     {% if request.user.is_authenticated %}

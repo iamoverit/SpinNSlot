@@ -1,23 +1,9 @@
-function getCookie(name) {
-    let cookieValue = null;
-    if (document.cookie && document.cookie !== '') {
-        const cookies = document.cookie.split(';');
-        for (let i = 0; i < cookies.length; i++) {
-            const cookie = cookies[i].trim();
-            if (cookie.startsWith(name + '=')) {
-                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                break;
-            }
-        }
-    }
-    return cookieValue;
-}
-
 document.addEventListener('DOMContentLoaded', function() {
     const themeToggle = document.getElementById('theme-toggle');
     const htmlEl = document.documentElement;
-    
+    const csrfToken = themeToggle.dataset.csrf;
     const savedTheme = localStorage.getItem('theme') || 'light';
+
     htmlEl.setAttribute('data-bs-theme', savedTheme);
     
     themeToggle.querySelector('i').className = savedTheme === 'dark' 
@@ -31,7 +17,7 @@ document.addEventListener('DOMContentLoaded', function() {
         fetch('/user/set-theme/', {
             method: 'POST',
             headers: {
-                'X-CSRFToken': getCookie('csrftoken'),
+                'X-CSRFToken': csrfToken,
                 'Content-Type': 'application/x-www-form-urlencoded',
             },
             body: `theme=${newTheme}`
