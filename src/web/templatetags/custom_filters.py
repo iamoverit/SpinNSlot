@@ -100,6 +100,11 @@ def string_to_color(s):
 def initials_badge(value):
     initials_value = initials(value)
     initials_color = string_to_color(value)
+    id = 'undefined'
+    try:
+        id = value.id
+    except:
+        pass
     return mark_safe(
-        f'<div style="background-color: {initials_color}" class="initials-badge-{value.id} circle-logo circle-image">{initials_value}</div>'
+        f'<div style="background-color: {initials_color}" class="initials-badge-{id} circle-logo circle-image">{initials_value}</div>'
     )
