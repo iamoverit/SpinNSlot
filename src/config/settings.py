@@ -155,15 +155,24 @@ LOGGING = {
             'level': 'DEBUG',
             'class': 'logging.StreamHandler',
         },
-        'file': {
+        'db_file': {
             'level': 'DEBUG',
             'class': 'logging.FileHandler',
-            'filename': 'django_queries.log',  # Choose a file name and path
+            'filename': 'django_queries.log',
+        },
+        'django_file': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': 'errors.log',
         },
     },
     'loggers': {
+        'django': {
+            'handlers': ['django_file'],
+            'level': 'ERROR',
+        },
         'django.db.backends': {
-            'handlers': ['console', 'file'],
+            'handlers': ['console', 'db_file'],
             'level': 'DEBUG',
             'propagate': False,
         },
