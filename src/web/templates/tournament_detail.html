@@ -4,6 +4,11 @@
 {% load markdownify %}
 {% load tz %}
 
+{% block og_description %}{{ tournament.name }}
+дата: {{ tournament.date|date:"j E Y" }} 
+время: {{ tournament.start_time|time:"H:i" }}–{{ tournament.end_time|time:"H:i" }}{% endblock %}
+{% block title %}{{ tournament.name }}{% endblock %}
+
 {% block content %}
 <div class="container mt-4">
     <div class="card mb-4">
@@ -60,7 +65,7 @@
                         </dd>
                     </dl>
                     
-                    <div class="mb-4">
+                    <div class="mb-4 lh-sm">
                         <h4>Описание турнира</h4>
                         <div>{{ tournament.description|markdownify }}</div>
                         {% if tournament.is_training %}

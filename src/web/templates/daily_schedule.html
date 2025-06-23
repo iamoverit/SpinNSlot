@@ -64,11 +64,13 @@
                                     <li>
                                         <a class="dropdown-item" href="#">
                                         <div class="d-flex align-items-center">
-                                            {% if name.avatar_url %}
-                                                <img src="{{ name.avatar_url }}" alt="Image" class="circle-image menu-trigger dropdown-toggle" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
-                                            {% else %}
-                                                {{ name|initials_badge }}
-                                            {% endif %}
+                                            {{ name|initials_badge }}
+                                            <img src="{{ name.avatar_url }}" 
+                                            alt=""
+                                            class="circle-image d-none avatar menu-trigger dropdown-toggle"
+                                            data-id="{{ name.id }}"
+                                            data-bs-toggle="dropdown"
+                                            aria-expanded="false">
                                             <div class="ps-2">{{ name }}</div>
                                         </div>
                                         </a>

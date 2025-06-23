@@ -11,6 +11,9 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta property="og:image" content="{% static 'images/27ddbd15-33c5-4374-8cbb-fa9922c07f99-wide.png' %}">
+    <meta property="og:title" content="{% block og_title %}{% endblock %}">
+    <meta property="og:description" content="{% block og_description %}{% endblock %}">
+    <meta property="og:url" content="{{ request.build_absolute_uri }}">
     <!-- Page title -->
     <title>{% block bootstrap5_title %}{% block title %}{% endblock %}{% endblock %}</title>
     <!-- Bootstrap CSS -->
