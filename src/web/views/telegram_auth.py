@@ -49,9 +49,7 @@ class TelegramAuthView(View):
                                                         "avatar_url": data.get("photo_url")
                                                     })
             if not created:
-                user.username = data.get("username", telegram_id)
-                user.first_name = data.get("first_name", "")
-                user.last_name = data.get("last_name", "")
+                user.avatar_url = data.get("photo_url")
                 user.save()
             login(request, user)
             return redirect('index')
