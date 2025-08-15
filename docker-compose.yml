@@ -7,8 +7,10 @@ services:
       gunicorn --config gunicorn_config.py config.wsgi:application"
     env_file: .env
     volumes:
-      - db:/app/db
-      - static_volume:/app/staticfiles
+      - ./volumes/db_volume:/app/db
+      - ./volumes/static_volume:/app/staticfiles
+    labels:
+      - "traefik.enable=false"
     expose:
       - 8000
     environment:
@@ -25,7 +27,7 @@ services:
     build: ./nginx
     env_file: .env
     volumes:
-      - static_volume:/app/staticfiles
+      - ./volumes/static_volume:/app/staticfiles
     expose:
       - 80
     ports:
@@ -39,15 +41,12 @@ services:
     command: python manage.py run_huey
     env_file: .env
     volumes:
-      - db:/app/db
+      - ./volumes/db_volume:/app/db
+    labels:
+      - "traefik.enable=false"
     depends_on:
       - web
     environment:
       - VIRTUAL_HOST=
       - LETSENCRYPT_HOST=
     restart: always
-volumes:
-  db:
-    external: true
-    name: spinnslot_db
-  static_volume:
