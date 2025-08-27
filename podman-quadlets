@@ -1,0 +1,94 @@
+::::::::::::::
+~/.config/containers/systemd/spinnslot_huey_worker.container
+::::::::::::::
+[Container]
+Image=localhost/spinnslot:latest
+ContainerName=huey_worker
+Network=traefik-net
+EnvironmentFile=%h/Github/SpinNSlot/.env
+Volume=%h/Github/SpinNSlot/volumes/db_volume:/app/db
+Exec=python manage.py run_huey
+
+[Install]
+WantedBy=default.target
+
+::::::::::::::
+~/.config/containers/systemd/spinnslot_nginx.container
+::::::::::::::
+[Container]
+Image=localhost/spinnslot-nginx:latest
+Network=traefik-net
+EnvironmentFile=%h/Github/SpinNSlot/.env
+Volume=%h/Github/SpinNSlot/volumes/static_volume:/app/staticfiles
+PublishPort=8012:80
+Label=traefik.enable=true
+Label=traefik.http.routers.flagman.rule=Host(`flagman.iamoverit.ru`)
+Label=traefik.http.routers.flagman.entrypoints=web,websecure
+Label=traefik.http.routers.flagman.tls.certresolver=letsencrypt
+
+[Install]
+WantedBy=default.target
+
+::::::::::::::
+~/.config/containers/systemd/spinnslot_web.container
+::::::::::::::
+[Container]
+ContainerName=spinnslot_web
+Image=localhost/spinnslot:latest
+Network=traefik-net
+EnvironmentFile=%h/Github/SpinNSlot/.env
+Volume=%h/Github/SpinNSlot/volumes/db_volume:/app/db
+Volume=%h/Github/SpinNSlot/volumes/static_volume:/app/staticfiles
+#Exec=sleep 1000
+Exec=sh -c "python manage.py migrate && python manage.py collectstatic --noinput && gunicorn --config gunicorn_config.py config.wsgi:application"
+
+[Install]
+WantedBy=default.target
+
+::::::::::::::
+~/.config/containers/systemd/traefik.container
+::::::::::::::
+[Container]
+ContainerName=traefik
+Image=docker.io/library/traefik:latest
+Exec=--api.dashboard=true \
+     --api.insecure=true \
+     --providers.docker=true \
+     --entrypoints.web.address=:80 \
+     --entrypoints.websecure.address=:443 \
+     --certificatesresolvers.letsencrypt.acme.httpchallenge.entrypoint=web \
+     --certificatesresolvers.letsencrypt.acme.email=letsencrypt@iamoverit.ru \
+     --certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json \
+     --certificatesresolvers.letsencript.acme.tlschallenge=true
+Volume=%t/podman/podman.sock:/var/run/docker.sock:z
+Volume=%h/Github/traefik/letsencrypt:/letsencrypt:z
+PublishPort=80:80
+PublishPort=443:443
+PublishPort=8080:8080
+SecurityLabelDisable=true # May be required for SELinux if not using :z option correctly
+Network=traefik-net
+
+[Install]
+WantedBy=default.target
+::::::::::::::
+/home/ilyaf/.config/containers/systemd/traefik-net.network
+::::::::::::::
+# ~/.config/containers/systemd/traefik-net.network
+[Network]
+Driver=bridge
+
+::::::::::::::
+~/.config/containers/systemd/whoami.container
+::::::::::::::
+[Container]
+ContainerName=whoami
+Image=traefik/whoami
+Label=traefik.enable=true traefik.http.routers.whoami.rule=Host(`whoami.iamoverit.ru`) traefik.http.routers.whoami.entrypoints=web,websecure traefik.http.routers.whoami.tls.certreso
+lver=letsencrypt
+Network=traefik-net
+
+[Service]
+Restart=always
+
+[Install]
+WantedBy=default.target
