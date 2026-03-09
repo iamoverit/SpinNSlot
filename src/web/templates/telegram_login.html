@@ -8,10 +8,7 @@
 
 {% if not request.user.is_authenticated %}
 <div class="alert alert-warning">
-    <a href="https://oauth.telegram.org/auth?bot_id={{ telegram_bot_id }}&origin={{ request.build_absolute_uri }}&return_to={% url 'telegram_auth' %}&embed=1"
-    class="telegram-login-btn">
-     Войти через Telegram
- </a>
+    Необходимо авторизоваться
 </div>
 {% else %}
 

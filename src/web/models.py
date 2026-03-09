@@ -8,6 +8,7 @@ from django.utils import timezone
 class CustomUser(AbstractUser):
     telegram_id = models.CharField(max_length=255, unique=True, blank=True, null=True)
     avatar_url = models.URLField(blank=True, null=True)
+    vk_id = models.CharField(max_length=255, unique=True, blank=True, null=True)
 
     def __str__(self):
         if self.first_name.strip():
