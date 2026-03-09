@@ -144,6 +144,11 @@ TELEGRAM_BOT_NAME = config('TELEGRAM_BOT_NAME')
 TELEGRAM_BOT_TOKEN = config('TELEGRAM_BOT_TOKEN', default='unsafe-secret-key')
 TELEGRAM_LOGIN_REDIRECT_URL = config('TELEGRAM_LOGIN_REDIRECT_URL', default='http://127.0.0.1/')
 
+VK_CLIENT_ID = config('VK_CLIENT_ID')
+VK_CLIENT_SECRET = config('VK_CLIENT_SECRET', default='unsafe-secret-key')
+VK_CLIENT_SERVICE = config('VK_CLIENT_SERVICE', default='unsafe-secret-key')
+VK_REDIRECT_URI = config('VK_REDIRECT_URI', default='http://localhost/')
+
 AUTH_USER_MODEL = 'web.CustomUser'
 
 SECURE_CROSS_ORIGIN_OPENER_POLICY = "same-origin-allow-popups"

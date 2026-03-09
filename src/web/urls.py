@@ -1,6 +1,8 @@
 from django.urls import path, include
 from django.contrib.auth import views as auth_views
 from django.conf import settings
+
+from web.views import vk_auth
 from .views import *
 
 urlpatterns = [
@@ -24,6 +26,8 @@ urlpatterns = [
 
     path("user/update/", user.user_update, name="user_update"),
     path('user/set-theme/', user.set_theme, name='set_theme'),
+    path("auth/vk/pkce",  vk_auth.vk_pkce, name="vk_pkce"),
+    path("auth/vk/callback", vk_auth.vk_callback),
 ]
 
 if settings.DEBUG:
