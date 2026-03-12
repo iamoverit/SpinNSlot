@@ -126,6 +126,7 @@ def vk_callback(request):
     user, created = CustomUser.objects.get_or_create(
         vk_id=f"vk_{vk_user_id}",
         defaults={
+            "username": f"vk_{vk_user_id}",
             "first_name": first_name,
             "last_name": last_name,
             "email": email,
