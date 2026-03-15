@@ -187,12 +187,12 @@ class NotificationService:
         message = self.strategy.get_reactivation_message()
         self.strategy._send_to_participants(message)
 
-    @task()
+    #@task()
     def send_tournament_reminder(self):
         message = self.strategy.get_user_reminder_message()
         self.strategy._send_to_participants(message)
 
-@task(retries=3, retry_delay=10)
+#@task(retries=3, retry_delay=10)
 def send_telegram_message(chat_id, text):
     url = f"https://api.telegram.org/bot{settings.TELEGRAM_BOT_TOKEN}/sendMessage"
     payload = {
