@@ -41,7 +41,6 @@ def vk_pkce(request):
     })
 
 
-@require_POST
 @csrf_protect
 def vk_callback(request):
     try:
@@ -121,6 +120,7 @@ def vk_callback(request):
     first_name = vk_user.get("first_name", "")
     last_name = vk_user.get("last_name", "")
     email = vk_user.get("email", "")
+    phone = vk_user.get("phone", "")
     avatar = vk_user.get("avatar", "")
 
     user, created = CustomUser.objects.get_or_create(
@@ -128,7 +128,8 @@ def vk_callback(request):
         defaults={
             "username": f"vk_{vk_user_id}",
             "first_name": first_name,
-            "last_name": last_name,
+            "last_name": last_name,            
+            "phone": phone,
             "email": email,
         },
     )
@@ -142,6 +143,9 @@ def vk_callback(request):
         changed.append("last_name")
     if email and user.email != email:
         user.email = email
+        changed.append("email")
+    if phone and user.phone != phone:
+        user.phone = phone
         changed.append("email")
     if avatar and user.avatar_url != avatar:
         user.avatar_url = avatar

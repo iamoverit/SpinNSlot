@@ -2,6 +2,7 @@ from django import forms
 from django.contrib import admin
 from django.contrib.auth.forms import UserChangeForm
 from django.urls import path
+from django.utils.html import format_html
 
 from web.admin.forms import TournamentForm
 from web.models import CustomUser, GuestParticipant, ItemSlot, UserSlot, Customers, TimeSlot, Tournament, TournamentRegistration
@@ -104,15 +105,55 @@ class CustomUserChangeForm(UserChangeForm):
             'Вы можете изменить пароль <a href=\'../password/\'>здесь</a>.'
         )
 
+class RegSourceFilter(admin.SimpleListFilter):
+    title = 'источник регистрации' # Заголовок над фильтром
+    parameter_name = 'source' # Имя параметра в URL
+
+    def lookups(self, request, model_admin):
+        # Варианты, которые увидит пользователь
+        return (
+            ('tg', 'Telegram'),
+            ('vk', 'VK'),
+            ('site', 'Сайт (Email)'),
+        )
+
+    def queryset(self, request, queryset):
+        # Логика фильтрации базы данных
+        if self.value() == 'tg':
+            return queryset.filter(telegram_id__isnull=False).exclude(telegram_id='')
+        if self.value() == 'vk':
+            return queryset.filter(vk_id__isnull=False).exclude(vk_id='')
+        if self.value() == 'site':
+            return queryset.filter(telegram_id__isnull=True, vk_id__isnull=True)
+        return queryset
+
 @admin.register(CustomUser)
 class CustomUserAdmin(admin.ModelAdmin):
     form = CustomUserChangeForm  # Используем кастомную форму
+    list_display = ('get_full_name', 'phone_or_email', 'is_staff', 'date_joined', 'get_reg_source')
+    list_filter = (RegSourceFilter, 'is_staff', 'date_joined')
     def get_urls(self):
         urls = super().get_urls()
         custom_urls = [
             path('<id>/password/', self.admin_site.admin_view(self.user_change_password)),
         ]
         return custom_urls + urls
+
+    @admin.display(description='Источник регистрации')
+    def get_reg_source(self, obj):
+        if obj.telegram_id:
+            return format_html('<b style="color: #24A1DE;">Telegram</b>')
+        if obj.vk_id:
+            return format_html('<b style="color: #4C75A3;">VK</b>')
+        return "Email"
+    
+    @admin.display(description='Связь')
+    def phone_or_email(self, obj):
+        if obj.phone:
+            return obj.phone
+        if obj.email:
+            return obj.email
+        return ""
 
     def user_change_password(self, request, id, form_url=''):
         from django.contrib.auth.views import PasswordChangeView
