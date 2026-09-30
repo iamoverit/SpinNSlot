@@ -5,6 +5,49 @@ from datetime import timedelta, datetime
 from django.core.validators import MinValueValidator
 from django.utils import timezone
 
+
+class SiteConfiguration(models.Model):
+    """Editable, singleton settings for the public site."""
+
+    id = models.PositiveSmallIntegerField(primary_key=True, default=1, editable=False)
+    is_closed = models.BooleanField(default=True, verbose_name="Клуб закрыт")
+    closed_title = models.CharField(
+        max_length=200,
+        default="Теннисный клуб закрыт",
+        verbose_name="Заголовок",
+    )
+    closed_message = models.TextField(
+        default=(
+            "Друзья, наш теннисный клуб завершил свою работу. "
+            "Бронирование столов и регистрация на турниры больше недоступны."
+        ),
+        verbose_name="Сообщение о закрытии",
+    )
+    gratitude_message = models.TextField(
+        default=(
+            "Спасибо организаторам, которые создавали турниры и встречи, "
+            "и каждому участнику — за игры, эмоции, поддержку и время, "
+            "проведённое вместе. Это была замечательная история."
+        ),
+        verbose_name="Благодарность",
+    )
+    updated_at = models.DateTimeField(auto_now=True, verbose_name="Обновлено")
+
+    class Meta:
+        verbose_name = "Настройка сайта"
+        verbose_name_plural = "Настройки сайта"
+
+    def __str__(self):
+        return "Режим работы клуба"
+
+    def save(self, *args, **kwargs):
+        self.pk = 1
+        super().save(*args, **kwargs)
+
+    @classmethod
+    def get_solo(cls):
+        return cls.objects.filter(pk=1).first() or cls()
+
 class CustomUser(AbstractUser):
     telegram_id = models.CharField(max_length=255, unique=True, blank=True, null=True)
     avatar_url = models.URLField(max_length=255, blank=True, null=True)

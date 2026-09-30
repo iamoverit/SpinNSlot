@@ -3,19 +3,22 @@
 {% load django_bootstrap5 %}
 {% load static %}
 
-{% block og_title %}{{customer.name}} {{customer.phone_number|cut:" "}}{% endblock %}
-{% block og_description %}{{customer.name}}{% endblock %}
-{% block title %}{{ customer.name }}{% endblock %}
+{% block og_title %}{% if site_configuration.is_closed %}{{ site_configuration.closed_title }}{% else %}{{customer.name}} {{customer.phone_number|cut:" "}}{% endif %}{% endblock %}
+{% block og_description %}{% if site_configuration.is_closed %}{{ site_configuration.closed_message }}{% else %}{{customer.name}}{% endif %}{% endblock %}
+{% block title %}{% if site_configuration.is_closed %}{{ site_configuration.closed_title }}{% else %}{{ customer.name }}{% endif %}{% endblock %}
 
 {% block bootstrap5_content %}
 <link rel="stylesheet" href="{% static 'css/styles.css' %}">
 {% include 'header.html' %}
     <div class="container">
-        {% autoescape off %}{% bootstrap_messages %}{% endautoescape %}
-
-        {% block content %}(no content){% endblock %}
+        {% if site_configuration.is_closed %}
+            {% include 'club_closed.html' %}
+        {% else %}
+            {% autoescape off %}{% bootstrap_messages %}{% endautoescape %}
+            {% block content %}(no content){% endblock %}
+        {% endif %}
     </div>
-{% include 'footer.html' %}
+{% if not site_configuration.is_closed %}{% include 'footer.html' %}{% endif %}
 {% block extra_js %}
     <script src="{% static 'js/color_mode_toggle.js' %}"></script>
     <script src="{% static 'js/avatar_handler.js' %}"></script>

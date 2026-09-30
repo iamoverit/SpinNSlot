@@ -1,4 +1,4 @@
-from web.models import Customers
+from web.models import Customers, SiteConfiguration
 from django.conf import settings
 
 
@@ -8,6 +8,7 @@ def customer_context(request):
 
     return {
         'customer': customer,
+        'site_configuration': SiteConfiguration.get_solo(),
         "telegram_bot_name": settings.TELEGRAM_BOT_NAME,
         "telegram_bot_id": settings.TELEGRAM_BOT_TOKEN.split(":")[0] if ":" in settings.TELEGRAM_BOT_TOKEN else None,
     }

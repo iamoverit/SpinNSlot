@@ -5,9 +5,34 @@ from django.urls import path
 from django.utils.html import format_html
 
 from web.admin.forms import TournamentForm
-from web.models import CustomUser, GuestParticipant, ItemSlot, UserSlot, Customers, TimeSlot, Tournament, TournamentRegistration
+from web.models import CustomUser, GuestParticipant, ItemSlot, UserSlot, Customers, TimeSlot, Tournament, TournamentRegistration, SiteConfiguration
 import datetime
 # Register your models here.
+
+
+@admin.register(SiteConfiguration)
+class SiteConfigurationAdmin(admin.ModelAdmin):
+    list_display = ('__str__', 'is_closed', 'updated_at')
+    list_editable = ('is_closed',)
+    readonly_fields = ('updated_at',)
+    fieldsets = (
+        ('Режим работы', {
+            'fields': ('is_closed',),
+            'description': 'Включите этот переключатель, чтобы вместо сайта показать посетителям сообщение о закрытии.',
+        }),
+        ('Сообщение для посетителей', {
+            'fields': ('closed_title', 'closed_message', 'gratitude_message'),
+        }),
+        ('Служебная информация', {
+            'fields': ('updated_at',),
+        }),
+    )
+
+    def has_add_permission(self, request):
+        return not SiteConfiguration.objects.exists()
+
+    def has_delete_permission(self, request, obj=None):
+        return False
 
 @admin.register(Customers)
 class CustomersAdmin(admin.ModelAdmin):

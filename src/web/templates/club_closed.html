@@ -1,0 +1,14 @@
+<main class="club-closed d-flex align-items-center justify-content-center py-5">
+    <section class="club-closed-card card border-0 shadow-lg text-center">
+        <div class="card-body p-4 p-md-5">
+            <div class="club-closed-icon mx-auto mb-4" aria-hidden="true">
+                <i class="bi bi-heart-fill"></i>
+            </div>
+            <p class="text-uppercase fw-semibold small text-primary mb-2">Важная информация</p>
+            <h1 class="display-6 fw-bold mb-4">{{ site_configuration.closed_title }}</h1>
+            <p class="lead mb-4">{{ site_configuration.closed_message|linebreaksbr }}</p>
+            <hr class="club-closed-divider mx-auto my-4">
+            <p class="fs-5 mb-0">{{ site_configuration.gratitude_message|linebreaksbr }}</p>
+        </div>
+    </section>
+</main>

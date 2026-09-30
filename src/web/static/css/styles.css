@@ -8,6 +8,35 @@
     }
 }
 
+.club-closed {
+    min-height: calc(100vh - 90px);
+}
+
+.club-closed-card {
+    width: min(100%, 760px);
+    background:
+        radial-gradient(circle at top right, rgba(var(--bs-primary-rgb), 0.12), transparent 38%),
+        var(--bs-body-bg);
+}
+
+.club-closed-icon {
+    display: grid;
+    place-items: center;
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    color: var(--bs-primary);
+    background-color: rgba(var(--bs-primary-rgb), 0.12);
+    font-size: 2rem;
+}
+
+.club-closed-divider {
+    width: 72px;
+    border-top-width: 3px;
+    border-color: var(--bs-primary);
+    opacity: 1;
+}
+
 .circle-image {
     width: 36px;
     height: 36px;

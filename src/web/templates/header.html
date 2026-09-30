@@ -16,6 +16,7 @@
                         <a  class="nav-link" href="{% url 'admin:index' %}">Admin</a>
                     </li>
                     {% endif %}
+                    {% if not site_configuration.is_closed %}
                     <li class="nav-item">
                         <a class="nav-link {% if '/weekly-schedule/' in request.path %}active{% endif %}" href="{% url 'weekly_schedule' %}">Расписание на неделю</a>
                     </li>
@@ -25,6 +26,7 @@
                     <li class="nav-item">
                         <a class="nav-link {% if '/tournaments/' in request.path %}active{% endif %}" href="{% url 'tournament_list' %}">Турниры</a>
                     </li>
+                    {% endif %}
                 </ul>
                 <button id="theme-toggle" class="btn btn-link" 
                         title="Сменить тему"
@@ -32,6 +34,7 @@
                         data-current-theme="{{ request.session.theme|default:'light' }}">
                     <i class="bi {% if request.session.theme == 'dark' %}bi-sun{% else %}bi-moon{% endif %}"></i>
                 </button>
+                {% if not site_configuration.is_closed %}
                 <div class="dropdown">
                     {% if request.user.is_authenticated %}
                         <a class="btn btn-primary" href="{% url 'user_update' %}">
@@ -154,6 +157,7 @@
 
                     {% endif %}
                 </div>
+                {% endif %}
             </div>
         </div>
     </nav>

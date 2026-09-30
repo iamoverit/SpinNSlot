@@ -21,6 +21,7 @@ from web.models import (
     CustomUser,
 )
 from web.permissions import staff_or_author_required
+from web.decorators import club_open_required
 from django.db import connection
 
 def tournament_list(request):
@@ -70,6 +71,7 @@ def tournament_detail(request, tournament_id):
         'total_participants': len(main_participants)+len(guest_participants_all)
     })
 
+@club_open_required
 @login_required(login_url='telegram_login')
 def add_guest_participant(request, tournament_id):
     tournament = get_object_or_404(Tournament, pk=tournament_id)
@@ -213,6 +215,7 @@ def weekly_schedule(request, selected_date_str=None):
     }
     return render(request, 'weekly_schedule.html', context)
 
+@club_open_required
 @ratelimit(key='user', rate='1/s', block=True)
 @login_required(login_url='telegram_login')
 def register_tournament(request, tournament_id):
@@ -227,6 +230,7 @@ def register_tournament(request, tournament_id):
     TournamentRegistration.objects.create(user=request.user, tournament=tournament)
     return redirect('tournament_detail', tournament_id=tournament.id)
 
+@club_open_required
 @ratelimit(key='user', rate='1/s', block=True)
 @login_required(login_url='telegram_login')
 def unregister_tournament(request, tournament_id):
@@ -239,6 +243,7 @@ def unregister_tournament(request, tournament_id):
         return render(request, 'error.html', {'message': 'You are not registred for the selected tournament!'})
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
+@club_open_required
 @ratelimit(key='user', rate='10/h', block=False)
 @login_required(login_url='telegram_login')
 def book_slot(request, time_slot_id, item_slot_id, reservation_date_str):
@@ -269,6 +274,7 @@ def book_slot(request, time_slot_id, item_slot_id, reservation_date_str):
         return render(request, 'error.html', {'message': 'Invalid date format'})
 
 
+@club_open_required
 @login_required(login_url='telegram_login')
 @staff_or_author_required
 def unbook_slot(request, user_slot_id):
